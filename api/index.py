@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-os.environ.setdefault("SWITCH_ROOT", str(ROOT))
-os.environ.setdefault("SWITCH_CLOUD", "1")
+os.environ["SWITCH_ROOT"] = str(ROOT)
+os.environ["SWITCH_CLOUD"] = "1"
 sys.path.insert(0, str(ROOT))
 
 from orchestrator import init_db  # noqa: E402

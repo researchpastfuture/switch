@@ -45,17 +45,30 @@ SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 def _switch_root() -> Path:
     env = os.environ.get("SWITCH_ROOT")
     if env:
-        return Path(env).expanduser().resolve()
+        p = Path(env).expanduser()
+        if not p.is_absolute():
+            p = (Path(__file__).resolve().parent / p).resolve()
+        return p
     if os.environ.get("VERCEL") or os.environ.get("SWITCH_CLOUD"):
         return Path(__file__).resolve().parent
     return Path.home() / "switch"
 
 
+def _cloud_mode() -> bool:
+    return os.environ.get("SWITCH_CLOUD", "").lower() in ("1", "true", "yes") or bool(os.environ.get("VERCEL"))
+
+
+def _state_root() -> Path:
+    if _cloud_mode():
+        return Path("/tmp/switch/state")
+    return _switch_root() / "state"
+
+
 SWITCH_ROOT = _switch_root()
 CONFIG_PATH = SWITCH_ROOT / "config.yml"
 TASKS_PATH = SWITCH_ROOT / "tasks.yml"
-STATE_DB = SWITCH_ROOT / "state" / "tasks.sqlite"
-LOGS_DIR = SWITCH_ROOT / "state" / "logs"
+STATE_DB = _state_root() / "tasks.sqlite"
+LOGS_DIR = _state_root() / "logs"
 
 
 def load_config() -> dict:
