@@ -1,0 +1,46 @@
+product: donorsecurity
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(python *)
+  - Bash(python3 *)
+  - Bash(pip install*)
+  - Bash(pytest*)
+  - Bash(flask *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(pip install --user*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - "*.key"
+  - "*.pem"
+  - "*donor*data*"
+  - "credentials*"
+  - "vercel.json"
+  - ".github/workflows/**"
+
+principles:
+  - "DonorSecurity is a privacy overlay around Bloomerang built to defend against active donor-list theft attempts at AF. Donor PII is the load-bearing asset — never log it raw, never email it in cleartext, never store it outside the encrypted vault."
+  - "Access to donor data is audit-logged. Never add a code path that reads donor records without writing an audit row."
+  - "AF protective voice — donors trust AF; the copy reflects that."

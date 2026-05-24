@@ -1,0 +1,44 @@
+product: afsuperfly
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(sh *)
+  - Bash(bash *)
+  - Bash(node *)
+  - Bash(python *)
+  - Bash(python3 *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(brew install*)
+  - Bash(sudo *)        # macOS native launcher — refuse anything sudo
+
+protected_paths:
+  - ".env"
+  - "seed-env.sh"       # sets up env tokens
+  - "*.key"
+  - "*.pem"
+  - ".github/workflows/**"
+
+principles:
+  - "AFSuperFLY is a hybrid macOS launcher + web component (mac/ and web/ subdirs). Don't cross those boundaries without an explicit task."
+  - "Recipes are user-visible features — don't break or renumber existing recipes without an explicit task."
+  - "AF protective voice in any user-facing copy."

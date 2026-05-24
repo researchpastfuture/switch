@@ -1,0 +1,45 @@
+product: ai_assistant
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(python *)
+  - Bash(python3 *)
+  - Bash(pip install*)
+  - Bash(pytest*)
+  - Bash(uvicorn *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(pip install --user*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - "*.key"
+  - "*.pem"
+  - "credentials*"
+  - ".github/workflows/**"
+
+principles:
+  - "AI Assistant queries 8 intel disciplines (OSINT/SOCMINT/FININT/GEOINT/IMINT/LEGINT/CORPINT/HUMINT/CYBINT) across 20 sources. Never leak intel-source identities in client-facing output."
+  - "Never log raw query content with PII. Hash or redact before any persistent log."
+  - "AF protective voice in any user-facing copy."

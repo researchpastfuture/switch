@@ -1,0 +1,47 @@
+product: verifyfirst
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+
+principles:
+  - "VerifyFirst is a public fraud-prevention SPA at verify1st.app — Vercel serverless backend, 11 cards. The 11 cards are load-bearing categories; do not collapse or rename without explicit approval."
+  - "FCRA scope: VerifyFirst is consumer-facing and must NOT be used or marketed for employment, credit, insurance, or housing decisions. Never add such uses."
+  - "Every claim must link to an authoritative primary source — government, court, regulator, or first-party."
+  - "AF protective voice."

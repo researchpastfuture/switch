@@ -1,0 +1,106 @@
+mode: working
+modes:
+  cautious:
+    metering: hard_cap
+    max_concurrent_agents: 4
+    max_budget_usd_per_agent: 5
+    session_budget_usd_cap: 50
+    require_approval_before_merge: true
+    auto_preview_deploy: true
+  working:
+    metering: usage_metered
+    max_concurrent_agents: 12
+    max_budget_usd_per_agent: 15
+    alert_thresholds_usd:
+    - 100
+    - 500
+    - 1000
+    require_approval_before_merge: true
+    auto_preview_deploy: true
+  production:
+    metering: usage_metered
+    max_concurrent_agents: 60
+    max_budget_usd_per_agent: 30
+    alert_thresholds_usd:
+    - 500
+    - 1000
+    - 3000
+    - 5000
+    require_approval_before_merge: true
+    auto_preview_deploy: true
+products:
+  truthmark:
+    path: ~/Documents/truthmark
+    stack: nextjs
+    deploy: vercel
+    branch_prefix: switch/tm
+  truthmark_signals:
+    path: ~/Documents/truthmark-signals
+    stack: nextjs
+    deploy: vercel
+    branch_prefix: switch/tms
+  halo:
+    path: ~/halo
+    stack: flask
+    deploy: vercel
+    branch_prefix: switch/halo
+  conduit:
+    path: ~/conduit
+    stack: flask
+    deploy: vercel
+    branch_prefix: switch/conduit
+  whiteboard:
+    path: ~/whiteboard
+    stack: flask
+    deploy: local
+    branch_prefix: switch/wb
+  ai_assistant:
+    path: ~/Desktop/assistant
+    stack: fastapi
+    deploy: local
+    branch_prefix: switch/aia
+  verifyfirst:
+    path: ~/Documents/GitHub/VerifyFirst
+    stack: node
+    deploy: vercel
+    branch_prefix: switch/vf
+  verifypro:
+    path: ~/Documents/GitHub/VerifyPro
+    stack: nextjs
+    deploy: vercel
+    branch_prefix: switch/vp
+  project_exodus:
+    path: ~/Documents/GitHub/PROJECT-EXODUS
+    stack: static
+    deploy: vercel
+    branch_prefix: switch/pex
+  veterans_support:
+    path: ~/veterans-support-app
+    stack: nextjs
+    deploy: vercel
+    branch_prefix: switch/vet
+  donorsecurity:
+    path: ~/donorsecurity
+    stack: flask
+    deploy: vercel
+    branch_prefix: switch/ds
+  cadet_mvp:
+    path: ~/Documents/family-osint/cadet-mvp
+    stack: nextjs
+    deploy: vercel
+    branch_prefix: switch/cm
+  afsuperfly:
+    path: ~/Documents/GitHub/AFSuperFLY
+    stack: hybrid
+    deploy: local
+    branch_prefix: switch/afs
+  outreachfirst:
+    path: ~/Documents/GitHub/OutreachFirst
+    stack: vercel-static
+    deploy: vercel
+    branch_prefix: switch/of
+worktrees_root: ~/switch/worktrees
+state_root: ~/switch/state
+default_model: claude-sonnet-4-6
+planner_model: claude-haiku-4-5
+planner_budget_usd: 0.5

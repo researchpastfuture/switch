@@ -1,0 +1,48 @@
+product: project_exodus
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+  - "SPEC.md"            # canonical spec — schema/scope changes by hand
+  - "ProjectExodus.pdf"
+
+principles:
+  - "Project Exodus is an AF Inc. anti-trafficking platform. The people in any data set are survivors or potential victims — treat their data with the highest care."
+  - "Never expose PII, location, or identity hints in publicly accessible routes."
+  - "Reporting features must default to anonymous; identity disclosure must be an explicit opt-in by the survivor."
+  - "AF protective voice — calm, declarative, never sensationalizing trafficking content."

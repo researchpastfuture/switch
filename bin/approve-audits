@@ -1,0 +1,39 @@
+#!/bin/sh
+# Bulk-approve all awaiting_approval `safe_audit` tasks. Safe because audits
+# only ADD STATUS.md / SUMMARY.md files — they never modify existing code.
+# Per-task approve still runs the protected_paths + secret-scan checks.
+SWITCH_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+SWITCH="$SWITCH_ROOT/bin/switch"
+exec "$SWITCH_ROOT/.venv/bin/python" - "$@" <<'PY'
+import sqlite3, subprocess, sys
+from pathlib import Path
+
+PROMPT_FILTER = sys.argv[1] if len(sys.argv) > 1 else "safe_audit"
+SWITCH = Path.home() / "switch" / "bin" / "switch"
+DB = Path.home() / "switch" / "state" / "tasks.sqlite"
+
+conn = sqlite3.connect(DB)
+rows = list(conn.execute(
+    "SELECT id, product FROM tasks WHERE status='awaiting_approval' AND prompt_id=?",
+    (PROMPT_FILTER,)
+))
+conn.close()
+
+if not rows:
+    print(f"No awaiting_approval tasks with prompt_id='{PROMPT_FILTER}'.")
+    sys.exit(0)
+
+print(f"Approving {len(rows)} '{PROMPT_FILTER}' task(s)...")
+ok = fail = 0
+for tid, product in rows:
+    r = subprocess.run([str(SWITCH), "approve", tid], capture_output=True, text=True)
+    msg = (r.stdout + r.stderr).strip()
+    if r.returncode == 0:
+        ok += 1
+        print(f"  ✓ {tid} {product}")
+    else:
+        fail += 1
+        first_line = msg.split('\n')[0]
+        print(f"  ! {tid} {product}: {first_line}")
+print(f"\nDone: {ok} approved, {fail} skipped/failed.")
+PY

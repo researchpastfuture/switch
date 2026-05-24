@@ -1,0 +1,54 @@
+product: veterans_support
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(tsc *)
+  - Bash(prisma *)
+  - Bash(npx prisma *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+  - Bash(prisma migrate reset*)     # would drop the prod DB
+  - Bash(npx prisma migrate reset*)
+
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - ".env.production"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+  - "prisma/migrations/**"  # schema migrations reviewed by hand
+
+principles:
+  - "Veterans Support App: AF × Boone Cutler Foundation. Three pillars (Help / Report / Pledge). Veterans in crisis use this — never break the Help pillar."
+  - "Crisis-resource paths must remain reachable even when the rest of the site is degraded. Don't move or rename them without an explicit task."
+  - "AF protective voice — calm, plain, never alarming or scolding. Real people in crisis read this copy."
+  - "Pledge counters and Report intake are user-facing trust signals — never display estimates or fabricated numbers."

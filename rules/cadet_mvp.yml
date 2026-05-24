@@ -1,0 +1,49 @@
+product: cadet_mvp
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(tsc *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+
+principles:
+  - "Cadet MVP is the Family Detective Lab flagship — used by kids. Every UI change must pass accessibility: alt text, semantic HTML, keyboard nav, WCAG AA contrast, no autoplay, no flashing."
+  - "The 16 routes and 11 case files are canonical. Don't rename or restructure without an explicit task."
+  - "Mechanics already in: parent-photos, show-your-work, read-all-instructions, behavioral scenarios. Don't simplify these."
+  - "Never condescend to kids. Same AF protective voice as Whiteboard — calm, plain, never sensationalizing."
+  - "No surprise sounds, no autoplay video, no rapid motion."

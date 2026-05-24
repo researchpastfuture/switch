@@ -1,0 +1,50 @@
+product: halo
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(python *)
+  - Bash(python3 *)
+  - Bash(pip install*)
+  - Bash(pytest*)
+  - Bash(flask *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(pip install --user*)
+  - Bash(brew install*)
+
+# The crypto engine and core schema are protected — touching them requires human review.
+protected_paths:
+  - ".env"
+  - "*.key"
+  - "*.pem"
+  - "crypto_engine.py"
+  - "vercel.json"
+  - ".github/workflows/**"
+
+principles:
+  - "E2EE is the product. ECDH for key agreement, AES-GCM for messages. Plaintext never touches the server."
+  - "Never log message plaintext or anything derived from it."
+  - "The 4-context schema (personal, family, work, public) is load-bearing. Do not simplify."
+  - "Six anti-scam features are load-bearing. Do not remove them."
+  - "AF protective voice."

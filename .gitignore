@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+state/tasks.sqlite
+state/logs/
+state/web.pid
+worktrees/
+dist/
+.env
+.DS_Store
+.vercel/

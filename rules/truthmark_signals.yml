@@ -1,0 +1,55 @@
+product: truthmark_signals
+
+# Signals is the editorial sister app — pattern-finding and trends over the
+# TruthMark corpus. It is allowed to surface patterns; it is NOT allowed to
+# score or grade actors. Editorial = "here's what the data shows," not
+# "here's who's bad."
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(tsc *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - ".env.production"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+  - "drizzle/migrations/**"   # Schema migrations — review by hand
+
+principles:
+  - "Signals is pattern-finding, not scoring. Surface what the data shows; never label actors as good or bad."
+  - "Every signal must trace back to primary records ingested from authoritative sources (Federal Register, Congress.gov, SCOTUS, OpenStates, etc.)."
+  - "Embeddings and clusters are tools, not judgments. Cluster names are descriptive, never evaluative."
+  - "AF protective voice."

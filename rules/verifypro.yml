@@ -1,0 +1,47 @@
+product: verifypro
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(tsc *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+
+principles:
+  - "VerifyPro is the B2B sister of VerifyFirst — FCRA-EXCLUDED by design. Never add or enable employment, credit, insurance, or housing-decision use cases. Add explicit refusal language where users might attempt it."
+  - "Outputs route to authoritative records — no scoring, no editorial commentary (same as TruthMark Principle 1)."
+  - "AF protective voice; B2B users are still operating on real people's records, treat that gravity in copy."

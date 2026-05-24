@@ -1,0 +1,5 @@
+#!/bin/sh
+# Switch entry point. Uses the bundled venv so `pip install` need not pollute system Python.
+# Add ~/switch/bin to PATH (e.g. `export PATH="$HOME/switch/bin:$PATH"`) or alias `switch` to this file.
+SWITCH_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+exec "$SWITCH_ROOT/.venv/bin/python" "$SWITCH_ROOT/switch.py" "$@"

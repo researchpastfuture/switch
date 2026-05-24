@@ -1,0 +1,5 @@
+# Switch task seed. Add tasks with `switch task add <product> <prompt-id> "context..."`
+# or edit this file directly and run `switch task load`.
+# Status is tracked in state/tasks.sqlite, not here — this file is just for seeds and bulk adds.
+
+tasks: []

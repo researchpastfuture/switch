@@ -1,0 +1,48 @@
+product: conduit
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(python *)
+  - Bash(python3 *)
+  - Bash(pip install*)
+  - Bash(pytest*)
+  - Bash(flask *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(pip install --user*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - "*.key"
+  - "*.pem"
+  - "crypto_utils.py"
+  - "vercel.json"
+  - ".github/workflows/**"
+
+principles:
+  - "Compartmentation is enforced by crypto. Never link identities across compartments (Heroes / operators / dissidents)."
+  - "Never add logs that could deanonymize users — no retained IP, no session timing, no User-Agent kept past the request."
+  - "Federated vetting layer is load-bearing. Do not weaken or bypass."
+  - "AF protective voice — Conduit users are people in danger; copy must be calm and clear."

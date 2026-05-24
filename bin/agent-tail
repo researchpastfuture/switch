@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+"""Parse a Switch agent log (stream-json) and print human-readable events."""
+import json, sys
+from pathlib import Path
+
+def short_path(s):
+    return (s or "").replace(str(Path.home()) + "/", "~/")
+
+def parse_file(path):
+    cost = 0.0
+    n_tool = 0
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            try:
+                e = json.loads(line)
+            except Exception:
+                continue
+            t = e.get("type")
+            if t == "assistant":
+                blocks = (e.get("message", {}) or {}).get("content", []) or []
+                for b in blocks:
+                    bt = b.get("type")
+                    if bt == "tool_use":
+                        n_tool += 1
+                        name = b.get("name", "?")
+                        inp = b.get("input", {}) or {}
+                        snip = (inp.get("file_path") or inp.get("command","")[:90]
+                                or inp.get("pattern","") or "")
+                        print(f"  -> {name:10s}  {short_path(snip)}")
+                    elif bt == "text":
+                        txt = (b.get("text") or "").strip()
+                        if txt:
+                            first = txt.splitlines()[0][:180]
+                            print(f"  msg: {first}")
+            elif t == "result":
+                cost = float(e.get("total_cost_usd", 0) or 0)
+                dur = e.get("duration_ms", 0)
+                turns = e.get("num_turns", 0)
+                print(f"\n  RESULT  cost=${cost:.4f}  duration={dur}ms  turns={turns}")
+
+if __name__ == "__main__":
+    for p in sys.argv[1:] or ["-"]:
+        parse_file(p)

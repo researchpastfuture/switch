@@ -1,0 +1,42 @@
+product: whiteboard
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(python *)
+  - Bash(python3 *)
+  - Bash(pip install*)
+  - Bash(pytest*)
+  - Bash(flask *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(pip install --user*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - "models.py"            # Schema — review schema changes by hand
+  - ".github/workflows/**"
+
+principles:
+  - "Whiteboard is used by kids. Every UI change must pass an accessibility check: alt text, semantic HTML, keyboard nav, WCAG AA contrast, no autoplay, no flashing."
+  - "The 4-section lesson format from Build Spec v1.0 is canonical. Do not invent new formats."
+  - "Never condescend to learners. AF protective voice."
+  - "No surprise sounds, no autoplay video, no flashing or rapid motion."

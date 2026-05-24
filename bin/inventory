@@ -1,0 +1,123 @@
+#!/bin/sh
+# Per-product Switch inventory. For each configured product:
+#  - Switch branches that were merged into main (with revert handles)
+#  - Switch branches still unmerged (can be deleted with no impact)
+#  - Files touched by Switch agents
+#  - Suspicious-content scan: UK references, other-org domains, GDPR/EU regulator names
+SWITCH_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+exec "$SWITCH_ROOT/.venv/bin/python" - "$@" <<'PY'
+import os, re, subprocess, sys
+from pathlib import Path
+import yaml
+
+SWITCH = Path.home() / "switch"
+with open(SWITCH / "config.yml") as f:
+    cfg = yaml.safe_load(f)
+
+SUSPICIOUS = [
+    (r"\.co\.uk\b",              "UK domain"),
+    (r"\bUnited Kingdom\b",      "UK reference"),
+    (r"\bUK\b(?! GFly)",         "'UK' (excluding AFSuperFLY's 'UK GFly')"),
+    (r"\bGDPR\b",                "GDPR (EU regulation)"),
+    (r"\bICO\b",                 "UK ICO (Info Commissioner)"),
+    (r"\bFCA\b(?!\s*Source)",    "UK FCA (Financial Conduct Authority)"),
+    (r"\bPSC\b",                 "UK PSC (People with Significant Control)"),
+    (r"\bCompanies House\b",     "UK Companies House"),
+    (r"\bMoney Saving Expert\b", "Money Saving Expert (UK brand)"),
+    (r"\bUK\.gov\b",             "UK.gov reference"),
+    (r"\.de\b|\.fr\b|\.es\b|\.ie\b", "EU country domain"),
+    (r"\bEU\s+(Commission|Council|Parliament)", "EU institution"),
+    (r"\bBundes",                "German government prefix"),
+    (r"https?://[^\s)\"']*\.uk\b","UK URL"),
+]
+SUSPICIOUS = [(re.compile(p, re.IGNORECASE), label) for p, label in SUSPICIOUS]
+
+
+def short(s, n=80):
+    return s[:n] + ("…" if len(s) > n else "")
+
+
+def git(*args, cwd):
+    r = subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True)
+    return r.stdout, r.returncode
+
+
+for name, pcfg in cfg["products"].items():
+    path = Path(os.path.expanduser(pcfg["path"])).resolve()
+    print("\n" + "=" * 76)
+    print(f"  {name}    {path}")
+    print("=" * 76)
+    if not path.exists():
+        print("  (path does not exist — skipping)")
+        continue
+    if not (path / ".git").is_dir():
+        print("  (not a git repo — skipping)")
+        continue
+
+    # default branch
+    out, _ = git("symbolic-ref", "refs/remotes/origin/HEAD", cwd=path)
+    target = (out.strip().split("/")[-1] if out.strip()
+              else (git("rev-parse", "--abbrev-ref", "HEAD", cwd=path)[0].strip() or "main"))
+
+    # All switch/ branches (local + remote)
+    out, _ = git("for-each-ref", "--format=%(refname:short)", "refs/heads/switch/", cwd=path)
+    local_branches = [b for b in out.strip().split("\n") if b]
+    out, _ = git("for-each-ref", "--format=%(refname:short)", "refs/remotes/origin/switch/", cwd=path)
+    remote_branches = [b.replace("origin/", "") for b in out.strip().split("\n") if b]
+    all_branches = sorted(set(local_branches + remote_branches))
+
+    # Merge commits from Switch on main
+    out, _ = git("log", "--oneline", "--merges", "--grep=switch/", target, cwd=path)
+    merges = [l for l in out.strip().split("\n") if l]
+    # Also direct (non-merge) Switch commits on main (e.g. when fast-forward happened or the dry-run direct merge)
+    out, _ = git("log", "--oneline", "--no-merges", f"--grep=Switch:", target, cwd=path)
+    direct = [l for l in out.strip().split("\n") if l]
+
+    print(f"  default branch: {target}")
+    print(f"  Switch merges on {target}: {len(merges)}")
+    for m in merges[:10]:
+        print(f"    {m}")
+    if len(merges) > 10:
+        print(f"    ... and {len(merges)-10} more")
+    print(f"  Direct Switch commits on {target}: {len(direct)}")
+    for d in direct[:5]:
+        print(f"    {d}")
+    print(f"  Unmerged Switch branches: {sum(1 for b in all_branches if b not in [m.split()[0] for m in merges])}")
+    print(f"  Total Switch branches (incl. merged): {len(all_branches)}")
+
+    # Diff stat against the commit before any Switch activity
+    # Find the first Switch commit and use its parent as baseline
+    out, _ = git("log", "--reverse", "--format=%H", "--grep=Switch", target, cwd=path)
+    first = (out.strip().split("\n") or [""])[0]
+    if first:
+        parent_out, _ = git("rev-parse", f"{first}^", cwd=path)
+        parent = parent_out.strip()
+        if parent:
+            stat_out, _ = git("diff", "--stat", f"{parent}..{target}", cwd=path)
+            stat_lines = [l for l in stat_out.strip().split("\n") if l]
+            print(f"  files changed by Switch (vs pre-Switch commit {parent[:7]}):")
+            for line in stat_lines[-12:]:
+                print(f"    {line}")
+
+            # Suspicious-content scan over the diff
+            diff_out, _ = git("diff", f"{parent}..{target}", cwd=path)
+            hits = {}
+            for pat, label in SUSPICIOUS:
+                matches = pat.findall(diff_out)
+                if matches:
+                    hits[label] = len(matches)
+            if hits:
+                print(f"  ! suspicious-content scan (matches in diff):")
+                for label, n in sorted(hits.items(), key=lambda x: -x[1])[:8]:
+                    print(f"    [{n}x] {label}")
+            else:
+                print(f"  ✓ suspicious-content scan: clean")
+
+    # Listing unmerged worktrees too
+    wt_out, _ = git("worktree", "list", cwd=path)
+    extra_wts = [l for l in wt_out.strip().split("\n") if "switch/worktrees" in l]
+    if extra_wts:
+        print(f"  active Switch worktrees ({len(extra_wts)}):")
+        for w in extra_wts[:5]:
+            print(f"    {w}")
+PY

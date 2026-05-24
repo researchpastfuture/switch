@@ -1,0 +1,53 @@
+product: truthmark
+
+# Tools the agent is allowed to use. Empty/missing = all tools allowed.
+# Format follows `claude --allowedTools` syntax.
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(tsc *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+
+# Paths the agent must not touch. Switch refuses to merge a branch that modifies these.
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - ".env.production"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+  - "middleware.ts"          # Demo gate — security-sensitive
+
+# Load-bearing invariants that ride along in every system prompt for this product.
+principles:
+  - "Berkeley Protocol Principle 1: no scoring, no editorial commentary. TruthMark routes users to authoritative records; it does not rate, rank, or grade them."
+  - "Every claim must link to a primary, authoritative source — government, court, regulator, or first-party record. No news aggregators as primary sources."
+  - "AF protective voice: calm, declarative, never scolding."
