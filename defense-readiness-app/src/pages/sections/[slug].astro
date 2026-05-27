@@ -1,0 +1,105 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../components/layout/BaseLayout.astro';
+import SectionNav from '../../components/layout/SectionNav.astro';
+import ToolRenderer from '../../components/tools/ToolRenderer.tsx';
+import ResearchToolkit from '../../components/research/ResearchToolkit.tsx';
+import { neighbors } from '../../data/toc';
+import { toolData } from '../../data/tools';
+
+export async function getStaticPaths() {
+  const sections = await getCollection('sections');
+  return sections.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { number, title, summary, tool, sources } = entry.data;
+const { prev, next } = neighbors(entry.data.slug);
+const toolPayload = tool?.dataKey ? toolData[tool.dataKey] : undefined;
+---
+
+<BaseLayout title={title} description={summary}>
+  <div class="lg:grid lg:grid-cols-[16rem_1fr] lg:gap-8">
+    <aside class="mb-6 lg:sticky lg:top-20 lg:mb-0 lg:h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <SectionNav current={entry.data.slug} />
+    </aside>
+
+    <article>
+      <header class="mb-4">
+        <p class="text-sm font-semibold uppercase tracking-wide text-blue-700">Section {number}</p>
+        <h1 class="mt-1 text-3xl font-bold text-slate-900">{title}</h1>
+        <p class="mt-2 text-slate-500">{summary}</p>
+        <button
+          onclick="window.print()"
+          class="no-print mt-3 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          Print this section
+        </button>
+      </header>
+
+      <ResearchToolkit client:load slug={entry.data.slug} title={title} sectionNumber={number} />
+
+      <div id="section-prose" class="prose prose-slate max-w-none">
+        <Content />
+      </div>
+
+      {
+        tool && (
+          <ToolRenderer
+            client:visible
+            type={tool.type}
+            data={toolPayload}
+            config={tool.config}
+            title={tool.title}
+            slug={entry.data.slug}
+            sectionNumber={number}
+          />
+        )
+      }
+
+      {
+        sources && sources.length > 0 && (
+          <section class="mt-8 border-t border-slate-200 pt-4">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">References</h2>
+            <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-600">
+              {sources.map((s) => (
+                <li>
+                  {s.url ? (
+                    <a href={s.url} class="text-blue-700 hover:underline">{s.label}</a>
+                  ) : (
+                    s.label
+                  )}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      }
+
+      <nav class="no-print mt-10 flex justify-between border-t border-slate-200 pt-4 text-sm">
+        {
+          prev ? (
+            <a href={`/sections/${prev.slug}`} class="text-blue-700 hover:underline">
+              ← {prev.number}. {prev.title}
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next ? (
+            <a href={`/sections/${next.slug}`} class="text-right text-blue-700 hover:underline">
+              {next.number}. {next.title} →
+            </a>
+          ) : (
+            <span />
+          )
+        }
+      </nav>
+    </article>
+  </div>
+</BaseLayout>

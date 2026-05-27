@@ -1,0 +1,48 @@
+---
+import { getCollection, render } from 'astro:content';
+import '../styles/global.css';
+import { SITE } from '../data/site';
+
+const sections = (await getCollection('sections')).sort(
+  (a, b) => a.data.number - b.data.number,
+);
+const rendered = await Promise.all(
+  sections.map(async (entry) => ({ entry, Content: (await render(entry)).Content })),
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{SITE.title} — Full Document</title>
+  </head>
+  <body class="bg-white text-slate-900">
+    <div class="mx-auto max-w-3xl px-6 py-10">
+      <button
+        onclick="window.print()"
+        class="no-print mb-6 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+      >
+        Print / Save as PDF
+      </button>
+
+      <header class="mb-10 text-center">
+        <h1 class="text-3xl font-bold">{SITE.title}</h1>
+        <p class="mt-1 text-lg text-slate-500">{SITE.subtitle}</p>
+        <p class="mt-2 text-sm text-slate-400">{SITE.author} · {SITE.version}</p>
+      </header>
+
+      {
+        rendered.map(({ entry, Content }) => (
+          <article class="prose prose-slate mb-12 max-w-none break-after-page">
+            <h2>
+              {entry.data.number}. {entry.data.title}
+            </h2>
+            <Content />
+          </article>
+        ))
+      }
+    </div>
+  </body>
+</html>

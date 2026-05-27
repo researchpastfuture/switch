@@ -1,0 +1,48 @@
+---
+import '../../styles/global.css';
+import { SITE } from '../../data/site';
+import SearchBox from './SearchBox.tsx';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE.title}` : SITE.title;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+    <header class="no-print sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+      <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
+        <a href="/" class="flex items-baseline gap-2 font-semibold text-slate-800">
+          <span class="text-blue-700">ADR 2030</span>
+          <span class="hidden text-sm font-normal text-slate-400 sm:inline">{SITE.subtitle}</span>
+        </a>
+        <div class="ml-auto flex flex-1 items-center justify-end gap-3">
+          <div class="flex-1 sm:max-w-xs"><SearchBox client:load /></div>
+          <a href="/dossier" class="whitespace-nowrap rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            My Dossier
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="no-print border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-400">
+      {SITE.author} · {SITE.version}
+    </footer>
+  </body>
+</html>

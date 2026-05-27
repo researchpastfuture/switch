@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import { TOC } from '../data/toc';
+import { SITE } from '../data/site';
+---
+
+<BaseLayout description={`${SITE.title} — ${SITE.subtitle}`}>
+  <section class="mb-10 text-center">
+    <p class="text-sm font-semibold uppercase tracking-wide text-blue-700">{SITE.tagline}</p>
+    <h1 class="mt-2 text-4xl font-bold text-slate-900 sm:text-5xl">{SITE.title}</h1>
+    <p class="mt-2 text-xl text-slate-500">{SITE.subtitle}</p>
+    <p class="mt-4 text-sm text-slate-400">{SITE.author} · {SITE.partners}</p>
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <a href={`/sections/${TOC[0].slug}`} class="rounded-md bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700">
+        Start reading
+      </a>
+      <a href="/print" class="rounded-md border border-slate-300 px-5 py-2.5 font-medium text-slate-700 hover:bg-slate-50">
+        Print full document
+      </a>
+    </div>
+  </section>
+
+  <h2 class="mb-4 text-lg font-semibold text-slate-800">Table of Contents</h2>
+  <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      TOC.map((entry) => (
+        <li>
+          <a
+            href={`/sections/${entry.slug}`}
+            class="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <span class="text-sm font-semibold text-blue-700">Section {entry.number}</span>
+            <span class="mt-1 font-medium text-slate-800">{entry.title}</span>
+            <span class="mt-2 text-sm text-slate-500">{entry.summary}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Dossier from '../components/research/Dossier.tsx';
+import { TOC } from '../data/toc';
+
+const tocLite = TOC.map(({ number, slug, title }) => ({ number, slug, title }));
+---
+
+<BaseLayout title="My Dossier" description="Your saved research, notes, highlights, and tool results.">
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold text-slate-900">My Research Dossier</h1>
+    <p class="mt-2 text-slate-500">
+      Everything you bookmark, note, highlight, or configure across the document collects here —
+      saved privately in your browser. Print it, or export it to move between devices.
+    </p>
+  </header>
+
+  <Dossier client:only="react" toc={tocLite} />
+</BaseLayout>
