@@ -2,4 +2,26 @@
 # or edit this file directly and run `switch task load`.
 # Status is tracked in state/tasks.sqlite, not here — this file is just for seeds and bulk adds.
 
-tasks: []
+# TruthMark News — buildable engineering work (Phase 1–3). Phase 0 (brand, counsel,
+# partner outreach) is handled off-repo and is intentionally NOT seeded here.
+#
+# NOT a fleet task: badge forgery / revocation-evasion threat modeling. The badge is a
+# trust credential and its signing/verification/revocation mechanics are security-critical.
+# Threat-model that in a dedicated session BEFORE building the real signing path — do not
+# let an agent improvise a scheme.
+tasks:
+  - product: truthmark_news
+    prompt: add_badge
+    context: "Phase 1 MVP: embeddable, tier-labeled badge widget (Sourced / Cross-checked / Investigated) that links to its public verification trail and can reflect a revoked/corrected state. Smallest version that works; do not design the signing/authenticity scheme — that is a separate threat-modeling task."
+
+  - product: truthmark_news
+    prompt: add_trail
+    context: "Phase 1 MVP: public verification trail page per verified story, showing tier, sources consulted, method, sign-off, and timestamp, with corrections shown in place and back-linked to the original story."
+
+  - product: truthmark_news
+    prompt: add_feature
+    context: "Phase 2: consumer destination — a page that aggregates partner-verified stories and routes readers to each story's trail. Discovery layer only; no scoring, ranking, or editorial commentary on outlets."
+
+  - product: truthmark_news
+    prompt: add_feature
+    context: "Phase 3: read-only public API exposing a verified story's tier and trail metadata (sources, method, sign-off, timestamp, current badge state) for third-party integrations. Read paths only; no badge issuance or revocation endpoints — those depend on the badge-integrity threat model."

@@ -39,6 +39,11 @@ products:
     stack: nextjs
     deploy: vercel
     branch_prefix: switch/tms
+  truthmark_news:
+    path: ~/Documents/truthmark-news
+    stack: nextjs
+    deploy: vercel
+    branch_prefix: switch/tmn
   halo:
     path: ~/halo
     stack: flask

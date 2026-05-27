@@ -1,0 +1,61 @@
+product: truthmark_news
+
+# TruthMark News is the verification layer for journalism: a B2B verified-newsroom
+# track (outlets embed a tier-labeled badge linked to a public trail) and a
+# consumer destination that carries only verified partner stories. The badge is
+# the surface; the trail is the substance. Honesty about the tier IS the
+# credibility — never claim more verification depth than was actually performed.
+
+allowed_tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(npm *)
+  - Bash(pnpm *)
+  - Bash(npx *)
+  - Bash(node *)
+  - Bash(tsc *)
+  - Bash(git status)
+  - Bash(git diff*)
+  - Bash(git add*)
+  - Bash(git commit*)
+  - Bash(git push origin*)
+  - Bash(git log*)
+  - Bash(git branch*)
+  - Bash(git checkout*)
+  - Bash(ls*)
+  - Bash(find*)
+  - Bash(cat*)
+
+disallowed_tools:
+  - Bash(rm -rf*)
+  - Bash(git push --force*)
+  - Bash(git push -f*)
+  - Bash(git reset --hard*)
+  - Bash(git push * main*)
+  - Bash(git push * master*)
+  - Bash(npm i -g*)
+  - Bash(brew install*)
+
+protected_paths:
+  - ".env"
+  - ".env.local"
+  - ".env.production"
+  - "*.key"
+  - "*.pem"
+  - "vercel.json"
+  - ".github/workflows/**"
+  # Badge integrity is the whole product. Signing, verification, and revocation
+  # code is security-critical — add the real module paths here once the repo
+  # exists so Switch refuses to merge unreviewed changes to them.
+
+principles:
+  - "Three verification tiers, in order of depth: Sourced (primary sourcing confirmed; quotes and attributions verified against the record), Cross-checked (Sourced + corroborated by an independent record or a second on-record source), Investigated (Cross-checked + original document, on-record interview, or forensic verification)."
+  - "Tier honesty is the credibility: the badge must state its tier and never imply more verification depth than was performed. Sourced exists so breaking news can be honest without waiting."
+  - "The badge is the surface; the trail is the substance. Every badge links to a public verification record: sources consulted, method, sign-off, and timestamp. No badge without a reachable trail."
+  - "Badges are revocable and corrections are visible. If a claim falls apart the badge changes state in place — never silently removed — and the correction is logged publicly and back-linked to the original story."
+  - "TruthMark News carries only verified stories from partner outlets and routes readers to the trail. It is a trail readers can walk themselves, not a verdict — no scoring, ranking, or editorial commentary on outlets (Berkeley Protocol Principle 1 applies)."
+  - "The badge is a trust credential: its authenticity and revocation behavior are load-bearing. Do not weaken signing, verification, or revocation propagation. Forgery and revocation-evasion threat modeling is tracked as a separate task — do not improvise security mechanisms here."
+  - "AF protective voice: calm, declarative, never scolding."
