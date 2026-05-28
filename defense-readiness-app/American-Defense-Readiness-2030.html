@@ -45,6 +45,12 @@
   section.sec h2.title { font-size:25px; margin:6px 0 10px; line-height:1.2; }
   section.sec .summary { color:var(--muted); font-style:italic; margin-bottom:16px; }
   .body p { margin:0 0 12px; }
+  .body h3 { font-size:18px; margin:18px 0 6px; }
+  .body h4 { font-size:15px; margin:14px 0 4px; }
+  .body ul,.body ol { margin:0 0 12px; padding-left:22px; }
+  .body li { margin:3px 0; }
+  .body strong { color:#fff; }
+  .body em { color:#cdd6ee; }
   .stub { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.4);
     color:#fcd9a0; padding:10px 12px; border-radius:10px; font-size:13.5px; }
   /* Tool card */
@@ -694,6 +700,456 @@ function buildSelector(items, intro, heading){
 }
 
 /* ============================================================================
+   SECTION PROSE  — mirrors content/sections/*.mdx
+   ============================================================================ */
+function inlineMd(t){
+  return t
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g,"<em>$1</em>");
+}
+function mdToHtml(md){
+  const lines=md.split("\n"); let html=""; let list=null;
+  const closeList=()=>{ if(list){ html+=`</${list}>`; list=null; } };
+  for(const raw of lines){
+    const line=raw.trim();
+    if(!line){ closeList(); continue; }
+    let m;
+    if(m=line.match(/^###\s+(.*)/)){ closeList(); html+=`<h4>${inlineMd(m[1])}</h4>`; }
+    else if(m=line.match(/^##\s+(.*)/)){ closeList(); html+=`<h3>${inlineMd(m[1])}</h3>`; }
+    else if(m=line.match(/^-\s+(.*)/)){ if(list!=="ul"){closeList();html+="<ul>";list="ul";} html+=`<li>${inlineMd(m[1])}</li>`; }
+    else if(m=line.match(/^(\d+)\.\s+(.*)/)){ if(list!=="ol"){closeList();html+="<ol>";list="ol";} html+=`<li>${inlineMd(m[2])}</li>`; }
+    else { closeList(); html+=`<p>${inlineMd(line)}</p>`; }
+  }
+  closeList(); return html;
+}
+
+const BODIES = {
+"introduction": `## Overview
+
+This document, *American Defense Readiness 2030 — Protect & Defend the Unwelcomed*, opens by framing what its authors describe as a convergence of pressures on the Republic. The introduction argues that strategic, institutional, and cultural challenges are no longer separate problems handled by separate agencies, but interlocking strains that, in the authors' view, reinforce one another and demand a single coordinated response.
+
+### The argument the document makes
+
+The authors contend that traditional readiness — measured largely in conventional military and industrial terms — no longer captures the full picture. They argue that a nation can field capable forces and still be vulnerable if public trust erodes, if families and communities fragment, and if the everyday information environment is shaped by actors who do not share its interests. The document presents these as "soft" failures with "hard" consequences.
+
+To make the case concrete, the introduction is paired with a **National Readiness Snapshot** — an editable set of gauges spanning strategic deterrence, institutional trust, cultural cohesion, child protection, and industrial capacity. The figures shown are illustrative starting points meant to prompt discussion, not official measurements; readers are invited to adjust them to reflect their own assessments.
+
+### What the document says is at stake
+
+- **Children as the central concern.** The authors repeatedly frame protection of children as the organizing priority of the entire doctrine.
+- **Information and belief as contested ground.** The document argues that attention, trust, and shared reality are now subjects of deliberate influence.
+- **Community-level preparedness.** Rather than locating all responsibility in federal institutions, the doctrine emphasizes families, schools, faith communities, and local networks.
+- **Lawful, coordinated action.** The authors stress that the measures they propose are meant to operate within existing legal and constitutional structures and in cooperation with established authorities.
+
+### How to read this document
+
+The introduction asks readers to approach the chapters as a connected argument rather than a menu of unrelated proposals. Each subsequent section develops one strand and pairs it with an interactive tool so readers can explore the concept rather than only read about it. This edition **presents** the authors' positions so they can be examined, searched, and discussed; where claims are contested or sensitive, it attributes them to the document rather than asserting them as established fact.`,
+
+"war-on-the-mind": `## Overview
+
+This section sets out the document's account of what it calls "the war on the mind." The authors argue that conflict in the information age is waged less through territory and materiel than through attention, perception, and belief — and that this shift has consequences for families and young people in particular.
+
+### Fifth-generation warfare, as the document defines it
+
+The authors use the term **fifth-generation warfare (5GW)** to describe conflict conducted primarily through information, perception, and social influence rather than conventional force. In their framing, the contested ground is the shared sense of reality a society relies on to make decisions together. The accompanying explorer lets readers open each concept and view the indicators the document associates with it.
+
+### The concepts the document highlights
+
+- **Attention capture.** Systems the authors describe as designed to maximize engagement, redirecting focus away from deliberate, self-directed thought.
+- **Mass grooming (the document's term).** The authors' label for what they characterize as large-scale efforts aimed at shaping the beliefs and identities of young people; presented as a contested claim.
+- **Identity disruption.** Pressures the authors argue destabilize a young person's sense of self, faith, and country.
+
+### Why the document treats this as a defense issue
+
+The authors' central move is to reframe influence operations as a national-security concern rather than a purely cultural or commercial one. They argue that if attention and belief can be shaped at scale, the resilience of a population's judgment becomes a strategic asset worth protecting.
+
+### A constructive emphasis
+
+The document's proposed response is protective and educational rather than coercive: media literacy, deliberate attention habits, strong family relationships, and the ability to seek out reliable information. The authors present discernment — slowing down, checking claims, resisting manufactured consensus — as the practical countermeasure, and connect it to the recovery and privacy practices developed later in the document.`,
+
+"child-centered-deterrence": `## Overview
+
+This section develops what the authors call **child-centered deterrence**. The argument is that deterrence — usually discussed in terms of armies and arsenals — should be reframed around the protection of children, which the document treats as the organizing priority of the entire doctrine.
+
+### Reframing deterrence
+
+The authors apply deterrence logic at the level of community and family: they argue that exploitation, trafficking, and predatory influence are deterred when protection is visible, coordinated, and locally rooted. The document locates this work within lawful structures, emphasizing coordination with schools, established reporting channels, and law enforcement.
+
+### A self-assessment, not a mandate
+
+The interactive **Community Preparedness Self-Assessment** turns the section's themes into a practical checklist. Each item reflects a protective practice the document discusses:
+
+- A discussed family safety and communication plan.
+- Knowing the school's protection and reporting points of contact.
+- Household online-use rules and parental controls.
+- Connection to a neighborhood or community watch network.
+- Knowing how to report exploitation or trafficking concerns.
+- Children being able to name several trusted adults.
+- Awareness of local counseling and recovery resources.
+
+The tool is a private reflection aid: nothing is submitted anywhere, and the score helps a household decide which gaps to close next.
+
+### What the document emphasizes
+
+Prevention is relational; reporting matters; and recovery is part of protection. The section closes by framing preparedness as a shared civic habit — prepared households are encouraged to mentor others rather than treat readiness as a private achievement.`,
+
+"osint-humint-watchtower": `## Overview
+
+This section presents the document's **Watchtower Model** — its proposal for combining open-source intelligence (OSINT) and human intelligence (HUMINT) into a layered "national shield." The authors argue that awareness, drawn from many ordinary and lawful sources, is itself a form of protection.
+
+### Two kinds of intelligence
+
+- **OSINT (open-source intelligence)** — information from publicly available sources: open reporting and filings, public social signals, open forums, and searchable official registries.
+- **HUMINT (human intelligence)** — information through people and relationships: community tip lines, trusted faith and civic liaisons, and field observers.
+
+The authors argue that neither layer is sufficient alone, and the "watchtower" image conveys overlapping vantage points rather than a single all-seeing eye.
+
+### Composing coverage
+
+The interactive **Watchtower Coverage Builder** lets readers toggle sources and see how many of five categories are covered. The point is the document's argument that resilience comes from **diversity of sources**.
+
+### Lawful and rights-respecting by design
+
+As presented here, the model is built on **publicly available information and voluntary community relationships**. It is framed as a tool for situational awareness and for routing concerns to the proper authorities — not for surveilling specific individuals, and not as a substitute for law enforcement or due process. The authors emphasize that respect for privacy and civil liberties is a condition of its legitimacy.
+
+### Why the document frames awareness as a shield
+
+The authors argue that many harms they describe depend on going unnoticed, and their proposed remedy is distributed, lawful attention — a culture of informed vigilance in which residents know how to report what they see.`,
+
+"border-cartel-internal": `## Overview
+
+This section surveys what the document describes as the nation's threat posture across three categories — **border**, **cartel**, and **internal** — and presents them together on an interactive map.
+
+### Three categories, one picture
+
+- **Border** concerns center on high-traffic crossing and smuggling corridors.
+- **Cartel** concerns cover organized trafficking and distribution networks.
+- **Internal** concerns address domestic vulnerabilities such as online recruitment and exploitation and transit chokepoints.
+
+The document's argument is that these are not isolated problems: the same routes and networks can carry different harms, so the authors treat them as a single connected posture.
+
+### Reading the Threat Posture Map
+
+The map places illustrative markers on a simplified map of the United States, each with a category, severity (1–3), and description. Two cautions, in keeping with the document's framing: the markers are **illustrative and editable**, not a live intelligence feed; and the map is a **conceptual aid**, not operational direction.
+
+### What the document emphasizes
+
+The authors use this section to argue for **coordination** among federal, state, local, and community partners, operating lawfully. The map connects later to the rescue-operations protocol (Section 8) and the sample-legislation tools (Section 11). Readers are encouraged to consult authoritative sources for current, verified information.`,
+
+"strategic-stockpiles": `## Overview
+
+This section presents the document's case for **strategic stockpiles** and what it calls domestic arsenal zones — pre-positioned reserves of essential supplies intended to make communities resilient during emergencies.
+
+### The argument for reserves
+
+The authors argue that resilience depends on having essential goods on hand before they are needed. The emphasis is on **continuity and care** — keeping people supplied, connected, and treated during an emergency.
+
+### The Stockpile Estimator
+
+A reader enters the population to be served, and the tool calculates recommended quantities from editable per-capita ratios. The defaults per 1,000 people are:
+
+- **Emergency water reserve** — 3,000 gallons
+- **Shelf-stable meals** — 9,000 meals
+- **Trauma / medical kits** — 40 kits
+- **Backup generators** — 2 units
+- **Field radios** — 15 units
+- **Reserve fuel** — 500 gallons
+
+These figures are starting points for discussion, not official standards, and the ratios can be edited to match local guidance.
+
+### How the document frames implementation
+
+Stockpiling scales from the household to the regional level. The authors tie it to the SAFE-USA fund (Section 10) and to the metrics framework (Section 15), and treat it as **lawful, civic preparedness** in the tradition of emergency-management planning — reviewed regularly so reserves remain current.`,
+
+"school-shields-brigades": `## Overview
+
+This section presents the document's proposals for protecting schools and organizing what the authors call **civic defense brigades** — trained, community-based groups intended to support safety and preparedness around schools.
+
+### School shields
+
+The "school shield" concept combines clear safety roles, trained personnel, established reporting and communication channels, and strong ties between schools and the families they serve. The emphasis is on **preparedness and coordination**.
+
+### Civic defense brigades
+
+As the document describes them, brigades are organized rosters of trained volunteers who support a school's safety functions in cooperation with staff and authorities:
+
+- **Safety coordinator** — oversees the plan and serves as the point of contact.
+- **Trained monitors** — provide attentive presence and awareness.
+- **First-aid responders** — supply basic medical and trauma readiness.
+- **Family liaison** — keeps families informed and connected.
+- **Communications lead** — manages reliable information flow.
+
+The document frames these as civic, lawful, cooperative roles.
+
+### The Brigade Planner
+
+The planner sizes a brigade for a given number of students using editable recommended ratios that can be adjusted to local policy.
+
+### What the document emphasizes
+
+The authors present this section in terms of **training, coordination, and care**, locating volunteers as a supportive layer in partnership with school officials and established authorities — not a replacement for professionals.`,
+
+"national-rescue-operations": `## Overview
+
+This section presents the document's **rescue-operations and sanctuary-entry protocol** — an ordered, step-by-step process for responding to reports of exploitation or endangerment in a lawful, coordinated, and trauma-informed way.
+
+### A protocol, not a free hand
+
+The most important feature, as the authors present it, is that response is **procedural and authorized at every step**. The protocol is built around coordination with law enforcement and authorized partners; it does not describe or endorse independent action.
+
+1. **Intake & verification** — confirm the report and document the situation through proper channels.
+2. **Coordinate with authorities** — engage law enforcement and authorized partners before any action.
+3. **Assess safety & risk** — evaluate risk to the individual and to responders.
+4. **Secure sanctuary placement** — identify a vetted, lawful safe placement.
+5. **Transport under protocol** — move only with authorized personnel and proper documentation.
+6. **Stabilize & provide care** — provide medical, trauma-informed, and basic-needs support.
+7. **Follow-up & casework** — continue casework, recovery resources, and review.
+
+### What the document emphasizes
+
+Verification comes first; authorities are engaged early; and care continues after the immediate response. Concerns surfaced through community vigilance enter a defined, accountable process rather than improvised intervention.
+
+### A note on scope
+
+This edition presents the protocol as a framework for understanding and discussion. It is high-level and procedural; it is not operational guidance and does not substitute for professional training, legal counsel, or the direction of qualified authorities.`,
+
+"faith-family-renewal": `## Overview
+
+This section presents what the authors call the **faith, family, and cultural renewal doctrine** — the document's argument that the deepest form of national resilience is cultural, rooted in strong families, shared values, and engaged communities.
+
+### The argument
+
+The authors argue that institutions and stockpiles are not enough if cultural foundations weaken. Their proposed remedy is renewal: protecting family time, nurturing faith and shared values, mentoring the young, serving neighbors, and cultivating discernment. This edition **presents** the doctrine as the authors articulate it, for understanding and reflection rather than as claims asserted as fact.
+
+### From doctrine to personal commitment
+
+From the document's stated intention — *"I commit to the following in support of family and community renewal"* — a reader selects commitments and assembles a printable pledge:
+
+- Protecting regular, device-free family time.
+- Nurturing faith and shared values in the household.
+- Mentoring or supporting a young person in the community.
+- Giving time to a local service or charitable effort.
+- Seeking out reliable information and modeling discernment.
+- Knowing and supporting one's neighbors.
+
+The pledge is entirely voluntary and personal; selections stay in the reader's own browser.
+
+### Connections within the document
+
+This section ties back to the "war on the mind" (Section 2) and points forward to the concluding covenant (Section 16). In the document's logic, renewal is the human foundation on which the more structural proposals rest.`,
+
+"safe-usa-fund": `## Overview
+
+This section explains the document's proposed funding mechanism: the **SAFE-USA fund** — the Strategic Arsenal & Freedom Emergency Fund. The authors argue the doctrine's other proposals require a dedicated, accountable source of support.
+
+### Why a dedicated fund
+
+The authors contend that durable capacity needs a stable funding stream with clear priorities, so that preparedness does not depend on year-to-year improvisation.
+
+### The allocation simulator
+
+The simulator lets a reader distribute a notional 100% across priorities, with a live total. The default allocation is:
+
+- **Child rescue & recovery — 30%**
+- **School shields — 20%**
+- **Strategic stockpiles — 15%**
+- **Watchtower / intelligence — 15%**
+- **Recovery programs — 10%**
+- **Emergency reserve — 10%**
+
+The tool flags whether selections add up to 100%, making trade-offs visible. These percentages are illustrative starting points for discussion.
+
+### What the allocation reveals
+
+Child rescue and recovery receives the largest share, consistent with the authors' framing of child protection as the central concern. The remaining priorities map directly to earlier sections.
+
+### Accountability
+
+The document frames SAFE-USA as a public, accountable instrument, connecting to the oversight provisions in Section 11 and the metrics dashboard in Section 15.`,
+
+"legislative-framework": `## Overview
+
+This section presents the document's **legislative framework** — its argument that the doctrine's goals should be pursued through ordinary, lawful policymaking, and its proposal for the kinds of provisions such legislation might contain.
+
+### Working through the legislative process
+
+The authors are explicit that durable change runs through law: drafting clear provisions, building support, and enacting and overseeing them through established institutions. References to advocacy and political-action committees are presented in this conventional civic light.
+
+### The Sample Bill Generator
+
+A reader assembles a model bill by selecting provisions; the tool adds a short title and combines them into formatted, copyable text:
+
+- **Definitions** — establishes the terms used in the Act.
+- **Child protection mandate** — protective standards for minors.
+- **Reporting requirements** — defined incidents reported within a timeframe.
+- **Funding authorization** — authorizes appropriations.
+- **Oversight & audit** — periodic audits and reporting.
+- **Enforcement** — penalties established by the responsible agency.
+
+The generated text is a **template for learning and drafting conversations**, not actual legislation or legal advice.
+
+### What the structure emphasizes
+
+The framework pairs a child-protection mandate with reporting requirements, and funding authorization with oversight and audit. Enforcement is administered by a responsible agency rather than private actors, consistent with the document's commitment to lawful institutions.`,
+
+"psychological-warfare-reversal": `## Overview
+
+This section presents the document's **reversal and recovery program** concepts — its proposed response to the influence dynamics described in Section 2.
+
+### From diagnosis to recovery
+
+The authors argue that the effects of attention capture and identity disruption can be addressed through deliberate, supportive practices. Terms like "de-hypnosis" and "deprogramming" describe regaining focus, re-examining beliefs through reliable sources, and rebuilding trusted relationships — framed as **educational and relational** practices rather than clinical interventions.
+
+### A self-guided pathway
+
+The pathway asks whether the reader is considering their own situation or a family member's, then offers low-pressure suggestions:
+
+- For one's own **focus**, a structured media break and daily reflection, pointing to the surveillance-detox checklist in Section 13.
+- For **re-examining beliefs**, writing down the claim, finding primary sources across perspectives, and discussing with a trusted mentor.
+- For a family member **open to talking**, leading with listening and shared activities.
+- For one **not yet open**, rebuilding connection first and seeking guidance from a counselor.
+
+### An explicit limitation
+
+The tool carries a prominent disclaimer: this is a **self-guided, informational pathway — not medical or psychological advice.** For urgent concerns, contact a qualified professional.
+
+### What the document emphasizes
+
+Patience, connection, and discernment. The authors favor listening over confrontation and treat professional help as a strength to seek rather than a last resort.`,
+
+"surveillance-detox": `## Overview
+
+This section presents the document's guidance on **strategic intelligence reclamation and surveillance detox** — practical steps individuals and families can take to strengthen their digital privacy and security.
+
+### Reclaiming a personal information footprint
+
+"Surveillance detox," as the document uses the term, refers to **lawful, personal digital hygiene**: reducing unnecessary data exposure, hardening accounts and devices, and making deliberate choices about services. The framing mirrors mainstream cybersecurity and privacy guidance.
+
+### The detox checklist
+
+**Accounts**
+- Use a password manager and unique passwords.
+- Enable two-factor authentication on key accounts.
+- Review and revoke unused app permissions.
+
+**Devices**
+- Keep devices and software updated.
+- Audit location-sharing settings.
+- Review microphone and camera permissions.
+
+**Data footprint**
+- Submit opt-outs to major data brokers.
+- Use a privacy-respecting search engine.
+- Audit public information on social profiles.
+
+Everything stays in the reader's own browser; none of it involves accessing anyone else's information.
+
+### What the document emphasizes
+
+The guidance is **defensive and lawful by design** — protecting one's own accounts, devices, and data, or exercising rights such as data-broker opt-outs. It pairs with the recovery pathway in Section 12, and the authors present digital hygiene as a habit to maintain rather than a one-time task.`,
+
+"watchtower-deployment": `## Overview
+
+This section lays out the document's **phased deployment schedule** for the watchtower model (Section 4) and its proposed roadmap for expansion through 2030.
+
+### A phased approach
+
+Rather than immediate full-scale implementation, the authors describe a deliberate, staged rollout — starting small, learning from pilots, and expanding as the approach proves workable:
+
+- **Phase 1 — 2026 (National):** Pilot watchtower nodes — stand up initial nodes and training.
+- **Phase 2 — 2027 (Regional):** Regional expansion — extend coverage to regional hubs.
+- **Phase 3 — 2028 (National):** Civic brigade integration — integrate school shields and brigades.
+- **Phase 4 — 2029 (Global):** Allied coordination — coordinate with allied partners.
+- **Phase 5 — 2030 (Global):** Full deployment — reach target deployment and benchmarks.
+
+These dates are the document's proposed schedule, offered for discussion rather than as fixed commitments.
+
+### What the sequence reveals
+
+Training precedes expansion; integration of the community layer comes mid-roadmap; and global coordination comes last, framed in terms of working with allied partners.
+
+### Connections within the document
+
+The timeline operationalizes the watchtower concept from Section 4 and connects to the metrics dashboard in Section 15: the final phase is defined by reaching measurable benchmarks rather than by the calendar alone.`,
+
+"restoration-metrics": `## Overview
+
+This section presents the document's **restoration metrics and deterrence benchmarks** — its proposed way of measuring whether the doctrine is working.
+
+### Measuring progress, not just intentions
+
+By defining a baseline, a current value, and a target, the authors create a simple way to see how far an effort has come. The dashboard shows each indicator as a progress bar, where completion is *(current − baseline) ÷ (target − baseline)*:
+
+- **Schools with civic defense brigades** — baseline 0, current 1,200, target 50,000.
+- **Active watchtower nodes** — baseline 0, current 35, target 500.
+- **Documented rescues / recoveries** — baseline 0, current 480, target 10,000.
+- **Families completing preparedness program** — baseline 0, current 9,500, target 250,000.
+- **Strategic stockpile coverage** — baseline 5%, current 22%, target 90%.
+
+These figures are illustrative, editable values, not verified official statistics.
+
+### How the metrics tie the document together
+
+Each indicator maps to an earlier section, making the dashboard a single scoreboard for the whole doctrine.
+
+### What the document emphasizes
+
+Commitments should be accountable. Targets make priorities explicit, and tracking over time guards against complacency. Readers are encouraged to ask how each would be measured in practice and to replace them with verified figures where available.`,
+
+"conclusion-covenant": `## Overview
+
+This concluding section gathers the document's themes into what the authors call **a new covenant for a protected republic** — a statement of shared principles meant to summarize the doctrine and invite commitment to it.
+
+### From doctrine to covenant
+
+The choice of the word *covenant* signals the authors' intent: a shared, voluntary commitment rather than a top-down program. The covenant's preamble, as the document states it, reads: *"We affirm a renewed covenant for a protected republic, and commit to."* The principles offered are:
+
+- Place the safety of children at the center of public life.
+- Strengthen families as the foundation of community.
+- Defend truth, discernment, and open inquiry.
+- Serve our neighbors and communities directly.
+- Remain vigilant sentinels, not passive spectators.
+- Pursue cultural and spiritual renewal.
+
+### The Covenant Builder
+
+The builder lets a reader select principles and assemble a printable covenant. Like the pledge in Section 9, it is voluntary and personal; selections remain in the reader's own browser.
+
+### How the conclusion frames the whole
+
+Each principle echoes an earlier section, so the conclusion functions as a summary in the form of commitments. The authors end on a constructive, participatory note — vigilance as engaged citizenship rather than fear. This edition presents the covenant as the authors articulate it, for reflection.`,
+
+"appendices": `## Overview
+
+This appendix collects reference materials for the document: pointers to the interactive assets used throughout, and a searchable glossary of the key terms.
+
+### Reference assets
+
+The explorer links back to the document's interactive reference tools so they can be found in one place:
+
+- **Threat Maps** — the interactive threat-posture map in Section 5.
+- **Rescue Protocols** — the step-by-step protocol in Section 8.
+- **Sample Legislation** — the bill generator in Section 11.
+
+### Searchable glossary
+
+The appendix includes a glossary searchable by keyword:
+
+- **5GW** — fifth-generation warfare; conflict waged through information and perception.
+- **OSINT** — open-source intelligence; information from publicly available sources.
+- **HUMINT** — human intelligence; information gathered through interpersonal contact.
+- **Watchtower Model** — the document's layered approach combining OSINT and HUMINT.
+- **SAFE-USA** — the proposed Strategic Arsenal & Freedom Emergency Fund.
+- **Civic Defense Brigade** — a community-based protection and preparedness group described for schools.
+- **Sanctuary Entry Protocol** — the described step-by-step process for safe placement during rescue operations.
+
+### How to use this appendix
+
+The appendix supports the rest of the document rather than introducing new arguments. As with the full document, the materials are presented for understanding, reference, and discussion, and readers are encouraged to consult authoritative external sources for current, verified information.`,
+};
+
+/* ============================================================================
    PAGE BUILD
    ============================================================================ */
 $("#site-title").textContent=SITE.title;
@@ -712,9 +1168,7 @@ SECTIONS.forEach(s=>{
     el("div",{class:"kicker"},`Section ${s.n}`),
     el("h2",{class:"title"},s.title),
     el("div",{class:"summary"},s.summary),
-    el("div",{class:"body"},
-      el("p",{},s.summary),
-      el("div",{class:"stub"},"Full section prose pending — drop your white-paper text for this section here (replaces this placeholder).")),
+    el("div",{class:"body",html:mdToHtml(BODIES[s.slug]||("## Overview\n\n"+s.summary))}),
     el("div",{class:"tool"},
       el("h3",{},"Interactive tool"),
       el("div",{class:"tool-kind"},s.tool),
