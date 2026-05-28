@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>American Defense Readiness 2030 — Interactive Edition</title>
+<style>
+  :root {
+    --bg:#0b1020; --panel:#121a30; --panel2:#0f1729; --ink:#e8ecf6; --muted:#9aa6c2;
+    --line:#243152; --accent:#3b82f6; --accent2:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+    --radius:14px;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .wrap { display:grid; grid-template-columns:300px 1fr; min-height:100vh; }
+  /* Sidebar */
+  aside {
+    position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+    background:var(--panel2); border-right:1px solid var(--line); padding:20px 16px;
+  }
+  aside h1 { font-size:18px; margin:0 0 2px; }
+  aside .sub { color:var(--muted); font-size:13px; margin-bottom:14px; }
+  .search { width:100%; padding:9px 11px; border-radius:10px; border:1px solid var(--line);
+    background:var(--panel); color:var(--ink); margin-bottom:12px; }
+  nav ol { list-style:none; margin:0; padding:0; }
+  nav li a { display:flex; gap:8px; padding:7px 9px; border-radius:8px; color:var(--ink); font-size:13.5px; }
+  nav li a:hover { background:var(--panel); text-decoration:none; }
+  nav li a .n { color:var(--muted); min-width:20px; }
+  nav li a.hidden { display:none; }
+  /* Main */
+  main { padding:36px clamp(20px,5vw,72px); max-width:1000px; }
+  header.doc { border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px; }
+  header.doc .tag { color:var(--accent); font-weight:600; letter-spacing:.04em; text-transform:uppercase; font-size:12px; }
+  header.doc h1 { font-size:34px; margin:8px 0 4px; line-height:1.15; }
+  header.doc h2 { font-size:19px; color:var(--muted); font-weight:500; margin:0 0 14px; }
+  header.doc .meta { color:var(--muted); font-size:13px; }
+  section.sec { padding:30px 0; border-bottom:1px solid var(--line); scroll-margin-top:20px; }
+  section.sec .kicker { color:var(--accent); font-size:13px; font-weight:600; }
+  section.sec h2.title { font-size:25px; margin:6px 0 10px; line-height:1.2; }
+  section.sec .summary { color:var(--muted); font-style:italic; margin-bottom:16px; }
+  .body p { margin:0 0 12px; }
+  .body h3 { font-size:18px; margin:18px 0 6px; }
+  .body h4 { font-size:15px; margin:14px 0 4px; }
+  .body ul,.body ol { margin:0 0 12px; padding-left:22px; }
+  .body li { margin:3px 0; }
+  .body strong { color:#fff; }
+  .body em { color:#cdd6ee; }
+  .stub { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.4);
+    color:#fcd9a0; padding:10px 12px; border-radius:10px; font-size:13.5px; }
+  /* Tool card */
+  .tool { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; margin-top:20px; }
+  .tool h3 { margin:0 0 4px; font-size:16px; }
+  .tool .tool-kind { color:var(--muted); font-size:12px; margin-bottom:14px; }
+  .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .between { justify-content:space-between; }
+  label.ck { display:flex; gap:10px; align-items:flex-start; padding:7px 0; cursor:pointer; }
+  label.ck input { margin-top:4px; }
+  .bar { height:10px; border-radius:6px; background:var(--line); overflow:hidden; }
+  .bar > span { display:block; height:100%; background:var(--accent); }
+  .pill { font-size:12px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); color:var(--muted); cursor:pointer; }
+  .pill.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .muted { color:var(--muted); }
+  .big { font-size:30px; font-weight:700; }
+  input[type=number],input[type=range]{ accent-color:var(--accent); }
+  input[type=number]{ width:120px; padding:7px 9px; border-radius:8px; border:1px solid var(--line); background:var(--panel2); color:var(--ink); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th,td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:600; }
+  .btn { padding:8px 13px; border-radius:9px; border:1px solid var(--line); background:var(--panel2);
+    color:var(--ink); cursor:pointer; font-size:13.5px; }
+  .btn:hover { border-color:var(--accent); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .out { white-space:pre-wrap; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px;
+    background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:14px; }
+  .map { position:relative; width:100%; aspect-ratio:16/10; background:
+    linear-gradient(180deg,#0e1730,#0b1020); border:1px solid var(--line); border-radius:12px; }
+  .marker { position:absolute; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:50%;
+    border:2px solid #fff; cursor:pointer; }
+  .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:8px; }
+  .swatch { display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:middle; margin-right:5px; }
+  .tl { border-left:2px solid var(--line); margin-left:8px; padding-left:18px; }
+  .tl .mil { position:relative; padding:10px 0; }
+  .tl .mil::before { content:""; position:absolute; left:-25px; top:16px; width:11px; height:11px;
+    border-radius:50%; background:var(--accent); border:2px solid var(--bg); }
+  details { border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:8px 0; background:var(--panel2); }
+  summary { cursor:pointer; font-weight:600; }
+  .footer { color:var(--muted); font-size:13px; padding:30px 0; }
+  @media (max-width:880px){ .wrap{ grid-template-columns:1fr; } aside{ position:static; height:auto; } .grid2{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside>
+    <h1 id="site-title"></h1>
+    <div class="sub" id="site-sub"></div>
+    <input class="search" id="search" placeholder="Search sections…" />
+    <nav><ol id="toc"></ol></nav>
+  </aside>
+  <main>
+    <header class="doc">
+      <div class="tag" id="doc-tagline"></div>
+      <h1 id="doc-title"></h1>
+      <h2 id="doc-subtitle"></h2>
+      <div class="meta" id="doc-meta"></div>
+    </header>
+    <div id="sections"></div>
+    <div class="footer">
+      Standalone interactive edition — all inputs stay in your browser. Nothing is sent anywhere.
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============================================================================
+   DATA  — mirrors src/data/* from the project. Edit values here freely.
+   ============================================================================ */
+const SITE = {
+  title: "American Defense Readiness 2030",
+  subtitle: "Protect & Defend the Unwelcomed",
+  tagline: "A National Doctrine to Rescue, Restore, and Defend",
+  author: "Project Defend & Protect Our Children (PDPC)",
+  partners: "In partnership with America's Future and allied coalitions",
+  version: "Version 1.0 — Long-Form Strategic Edition",
+};
+
+const SECTIONS = [
+  { n:1, slug:"introduction", title:"Introduction: The Strategic Crisis of the Republic",
+    summary:"Frames the document: the case that the nation faces converging strategic, institutional, and cultural pressures requiring a coordinated response.",
+    tool:"readiness-gauge" },
+  { n:2, slug:"war-on-the-mind", title:"The War on the Mind: Fifth Generation Warfare and Mass Grooming",
+    summary:"Defines fifth-generation warfare and information-age influence operations, and how they are described as targeting attention, belief, and identity.",
+    tool:"concept-explorer" },
+  { n:3, slug:"child-centered-deterrence", title:"Child-Centered Deterrence: The Forgotten War at Home",
+    summary:"Presents a child-protection-centered view of deterrence and a self-assessment of community preparedness.",
+    tool:"risk-assessment-checklist" },
+  { n:4, slug:"osint-humint-watchtower", title:"OSINT + HUMINT as National Shield: The Watchtower Model",
+    summary:"Describes combining open-source and human intelligence into a layered \"watchtower\" model, and lets you compose source coverage.",
+    tool:"intel-source-builder" },
+  { n:5, slug:"border-cartel-internal", title:"Border, Cartel, and Internal Threat Posture",
+    summary:"Surveys the threat posture across border, cartel, and internal categories on an interactive map.",
+    tool:"threat-map" },
+  { n:6, slug:"strategic-stockpiles", title:"Strategic Stockpiles and Domestic Arsenal Zones",
+    summary:"Covers strategic stockpiles and domestic arsenal planning, with a per-capita stockpile estimator.",
+    tool:"stockpile-planner" },
+  { n:7, slug:"school-shields-brigades", title:"School Shields and Civic Defense Brigades",
+    summary:"Outlines school protection and civic defense brigade concepts, with a brigade composition planner.",
+    tool:"brigade-builder" },
+  { n:8, slug:"national-rescue-operations", title:"National Rescue Operations & Sanctuary Entry Protocol",
+    summary:"Walks through a step-by-step rescue-operations and sanctuary-entry protocol you can track.",
+    tool:"protocol-stepper" },
+  { n:9, slug:"faith-family-renewal", title:"Faith, Family, and Cultural Renewal Doctrine",
+    summary:"Presents the cultural renewal doctrine and lets you assemble a personal or community pledge.",
+    tool:"pledge-commitment-tracker" },
+  { n:10, slug:"safe-usa-fund", title:"SAFE-USA: Strategic Arsenal & Freedom Emergency Fund",
+    summary:"Explains the proposed SAFE-USA fund and offers a notional budget allocation simulator.",
+    tool:"fund-allocation-simulator" },
+  { n:11, slug:"legislative-framework", title:"PDPC Legislative Framework & PAC-Enabled Mandates",
+    summary:"Describes the legislative framework and generates a formatted sample-bill template from your selections.",
+    tool:"bill-template-generator" },
+  { n:12, slug:"psychological-warfare-reversal", title:"Psychological Warfare Reversal Programs (De-hypnosis, Deprogramming)",
+    summary:"Presents reversal/recovery program concepts as a branching, self-guided pathway.",
+    tool:"deprogramming-pathway" },
+  { n:13, slug:"surveillance-detox", title:"Strategic Intelligence Reclamation and Surveillance Detox",
+    summary:"Offers a categorized digital-hardening and \"surveillance detox\" checklist with progress tracking.",
+    tool:"surveillance-detox-checklist" },
+  { n:14, slug:"watchtower-deployment", title:"PDPC Watchtower Deployment Schedule and Global Expansion",
+    summary:"Lays out the phased deployment schedule and expansion roadmap on an interactive timeline.",
+    tool:"deployment-timeline" },
+  { n:15, slug:"restoration-metrics", title:"National Restoration Metrics and Deterrence Benchmarks",
+    summary:"Tracks restoration metrics and deterrence benchmarks on a baseline / current / target dashboard.",
+    tool:"metrics-dashboard" },
+  { n:16, slug:"conclusion-covenant", title:"Conclusion: A New Covenant for a Protected Republic",
+    summary:"Concludes the document and lets you assemble a printable covenant from its principles.",
+    tool:"covenant-builder" },
+  { n:17, slug:"appendices", title:"Appendices: Threat Maps, Rescue Protocols, Sample Legislation",
+    summary:"Reference appendix: downloadable assets and a searchable glossary of terms used throughout.",
+    tool:"appendix-explorer" },
+];
+
+const DATA = {
+  readiness: [
+    { label:"Strategic Deterrence", value:42, target:90, note:"Foreign-facing posture." },
+    { label:"Institutional Trust", value:35, target:85 },
+    { label:"Cultural Cohesion", value:38, target:80 },
+    { label:"Child Protection", value:30, target:95, note:"Central concern of the document." },
+    { label:"Industrial Capacity", value:55, target:90 },
+  ],
+  concepts: [
+    { term:"Fifth-Generation Warfare (5GW)", definition:"Conflict waged primarily through information, perception, and social influence rather than conventional force.", indicators:["Narrative manipulation","Manufactured consensus","Erosion of shared reality"] },
+    { term:"Attention Capture", definition:"Designing systems to maximize engagement, redirecting focus away from deliberate, self-directed thought.", indicators:["Compulsive use patterns","Infinite feeds","Reward-loop reinforcement"] },
+    { term:"Mass Grooming (as described in the document)", definition:"The document's term for large-scale efforts it argues are aimed at shaping the beliefs and identities of young people.", indicators:["Targeted messaging to minors","Normalization campaigns","Peer-pressure amplification"] },
+    { term:"Identity Disruption", definition:"Pressures the document describes as destabilizing a young person's sense of self, faith, and country.", indicators:["Confusion messaging","Isolation from family","Authority substitution"] },
+  ],
+  deterrenceChecklist: {
+    items:[
+      { id:"family-plan", label:"Family has a discussed safety and communication plan", weight:10 },
+      { id:"school-contact", label:"Know the school's protection and reporting points of contact", weight:10 },
+      { id:"online-rules", label:"Household online-use rules and parental controls are in place", weight:15 },
+      { id:"community-watch", label:"Connected to a neighborhood or community watch network", weight:15 },
+      { id:"reporting-knowledge", label:"Know how to report exploitation or trafficking concerns", weight:20 },
+      { id:"trusted-adults", label:"Children can name several trusted adults", weight:15 },
+      { id:"recovery-resources", label:"Aware of local counseling / recovery resources", weight:15 },
+    ],
+    bands:[
+      { min:0, label:"Getting started", note:"Pick two items below to address this week." },
+      { min:40, label:"Developing", note:"A foundation is in place; close the remaining gaps." },
+      { min:70, label:"Prepared", note:"Strong coverage — review and keep it current." },
+      { min:95, label:"Highly prepared", note:"Comprehensive. Consider mentoring other families." },
+    ],
+  },
+  intelSources: {
+    categories:["Public web","Social","Community","Field reports","Records"],
+    sources:[
+      { id:"news", name:"News & public records", kind:"OSINT", category:"Public web", description:"Open reporting and published filings." },
+      { id:"social", name:"Social media monitoring", kind:"OSINT", category:"Social", description:"Public posts and trend signals." },
+      { id:"forums", name:"Open forums & boards", kind:"OSINT", category:"Social", description:"Publicly accessible discussion spaces." },
+      { id:"tips", name:"Community tip line", kind:"HUMINT", category:"Community", description:"Reports from residents and volunteers." },
+      { id:"liaisons", name:"Faith & civic liaisons", kind:"HUMINT", category:"Community", description:"Trusted local relationships." },
+      { id:"field", name:"Field observers", kind:"HUMINT", category:"Field reports", description:"On-the-ground first-hand accounts." },
+      { id:"registry", name:"Public registries", kind:"OSINT", category:"Records", description:"Searchable official databases." },
+    ],
+  },
+  threats: {
+    categories:["Border","Cartel","Internal"],
+    markers:[
+      { label:"Southwest border corridor", category:"Border", x:30, y:78, severity:3, detail:"High-traffic crossing and smuggling corridor." },
+      { label:"Gulf trafficking routes", category:"Cartel", x:47, y:82, severity:3, detail:"Maritime and overland smuggling activity." },
+      { label:"Southwest distribution hub", category:"Cartel", x:33, y:60, severity:2, detail:"Regional distribution and staging." },
+      { label:"Northeast urban node", category:"Internal", x:82, y:32, severity:2, detail:"Online recruitment and exploitation concern." },
+      { label:"Midwest interstate hub", category:"Internal", x:60, y:40, severity:1, detail:"Transit and logistics chokepoint." },
+      { label:"West coast port", category:"Cartel", x:9, y:45, severity:2, detail:"Port-of-entry contraband risk." },
+    ],
+  },
+  stockpile: {
+    defaultPopulation:50000,
+    items:[
+      { label:"Emergency water reserve", unit:"gal", perThousand:3000 },
+      { label:"Shelf-stable meals", unit:"meals", perThousand:9000 },
+      { label:"Trauma / medical kits", unit:"kits", perThousand:40 },
+      { label:"Backup generators", unit:"units", perThousand:2 },
+      { label:"Field radios", unit:"units", perThousand:15 },
+      { label:"Reserve fuel", unit:"gal", perThousand:500 },
+    ],
+  },
+  brigade: {
+    studentsPer:500, defaultStudents:1000,
+    roles:[
+      { label:"Safety coordinator", recommendedPer:1, max:10 },
+      { label:"Trained monitors", recommendedPer:4, max:40 },
+      { label:"First-aid responders", recommendedPer:2, max:20 },
+      { label:"Family liaison", recommendedPer:1, max:10 },
+      { label:"Communications lead", recommendedPer:1, max:10 },
+    ],
+  },
+  rescueProtocol: {
+    steps:[
+      { title:"Intake & verification", detail:"Confirm the report and document the situation through proper channels." },
+      { title:"Coordinate with authorities", detail:"Engage law enforcement and authorized partners before any action." },
+      { title:"Assess safety & risk", detail:"Evaluate risk to the individual and responders." },
+      { title:"Secure sanctuary placement", detail:"Identify a vetted, lawful safe placement." },
+      { title:"Transport under protocol", detail:"Move only with authorized personnel and documentation." },
+      { title:"Stabilize & provide care", detail:"Medical, trauma-informed, and basic-needs support." },
+      { title:"Follow-up & casework", detail:"Ongoing casework, recovery resources, and review." },
+    ],
+  },
+  pledge: {
+    intro:"I commit to the following in support of family and community renewal:",
+    commitments:[
+      { id:"family-time", text:"Protect regular, device-free family time." },
+      { id:"faith", text:"Nurture faith and shared values in my household." },
+      { id:"mentor", text:"Mentor or support a young person in my community." },
+      { id:"service", text:"Give time to a local service or charitable effort." },
+      { id:"truth", text:"Seek out reliable information and model discernment." },
+      { id:"neighbor", text:"Know and support my neighbors." },
+    ],
+  },
+  fundBuckets: {
+    totalLabel:"SAFE-USA Emergency Fund",
+    buckets:[
+      { id:"child", label:"Child rescue & recovery", defaultPct:30, color:"#2563eb" },
+      { id:"school", label:"School shields", defaultPct:20, color:"#16a34a" },
+      { id:"stockpiles", label:"Strategic stockpiles", defaultPct:15, color:"#d97706" },
+      { id:"intel", label:"Watchtower / intelligence", defaultPct:15, color:"#9333ea" },
+      { id:"recovery", label:"Recovery programs", defaultPct:10, color:"#dc2626" },
+      { id:"reserve", label:"Emergency reserve", defaultPct:10, color:"#0891b2" },
+    ],
+  },
+  billTemplate: {
+    titlePrefix:"A BILL",
+    provisions:[
+      { id:"definitions", label:"Definitions", text:"SECTION 1. DEFINITIONS. For purposes of this Act, the following terms shall apply as defined herein." },
+      { id:"protection", label:"Child protection mandate", text:"SECTION 2. CHILD PROTECTION. Covered entities shall implement protective standards for minors as specified by the responsible agency." },
+      { id:"reporting", label:"Reporting requirements", text:"SECTION 3. REPORTING. Covered entities shall report defined incidents within the prescribed timeframe." },
+      { id:"funding", label:"Funding authorization", text:"SECTION 4. FUNDING. There are authorized to be appropriated such sums as may be necessary to carry out this Act." },
+      { id:"oversight", label:"Oversight & audit", text:"SECTION 5. OVERSIGHT. The responsible agency shall conduct periodic audits and report findings." },
+      { id:"enforcement", label:"Enforcement", text:"SECTION 6. ENFORCEMENT. Violations shall be subject to penalties established by the responsible agency." },
+    ],
+  },
+  deprogramming: {
+    start:"root",
+    disclaimer:"This is a self-guided, informational pathway — not medical or psychological advice. For urgent concerns, contact a qualified professional.",
+    nodes:{
+      root:{ prompt:"Who is this pathway for?", options:[{label:"Myself",next:"self"},{label:"A family member",next:"family"}] },
+      self:{ prompt:"What feels most pressing right now?", options:[{label:"Information overload / focus",next:"focus"},{label:"Beliefs I want to re-examine",next:"beliefs"}] },
+      family:{ prompt:"Is the person open to talking?", options:[{label:"Yes",next:"open"},{label:"Not yet",next:"closed"}] },
+      focus:{ outcome:"Start with a structured media break and a daily reflection routine; revisit the surveillance-detox checklist in Section 13." },
+      beliefs:{ outcome:"Write down the claim, find primary sources on multiple sides, and discuss with a trusted mentor before concluding." },
+      open:{ outcome:"Lead with listening and shared activities; introduce resources gradually and without pressure." },
+      closed:{ outcome:"Rebuild connection first; keep communication open and non-judgmental, and seek guidance from a counselor." },
+    },
+  },
+  detoxChecklist: {
+    categories:[
+      { id:"accounts", label:"Accounts", items:[
+        { id:"passwords", label:"Use a password manager and unique passwords" },
+        { id:"2fa", label:"Enable two-factor authentication on key accounts" },
+        { id:"review-apps", label:"Review and revoke unused app permissions" }] },
+      { id:"devices", label:"Devices", items:[
+        { id:"updates", label:"Keep devices and software updated" },
+        { id:"location", label:"Audit location-sharing settings" },
+        { id:"mic-cam", label:"Review microphone and camera permissions" }] },
+      { id:"data", label:"Data footprint", items:[
+        { id:"data-brokers", label:"Submit opt-outs to major data brokers" },
+        { id:"search", label:"Use a privacy-respecting search engine" },
+        { id:"social-audit", label:"Audit public information on social profiles" }] },
+    ],
+  },
+  timeline: {
+    regions:["National","Regional","Global"],
+    milestones:[
+      { phase:"Phase 1", period:"2026", region:"National", title:"Pilot watchtower nodes", detail:"Stand up initial nodes and training." },
+      { phase:"Phase 2", period:"2027", region:"Regional", title:"Regional expansion", detail:"Extend coverage to regional hubs." },
+      { phase:"Phase 3", period:"2028", region:"National", title:"Civic brigade integration", detail:"Integrate school shields and brigades." },
+      { phase:"Phase 4", period:"2029", region:"Global", title:"Allied coordination", detail:"Coordinate with allied partners." },
+      { phase:"Phase 5", period:"2030", region:"Global", title:"Full deployment", detail:"Reach target deployment and benchmarks." },
+    ],
+  },
+  metrics: [
+    { label:"Schools with civic defense brigades", baseline:0, current:1200, target:50000, unit:"schools" },
+    { label:"Active watchtower nodes", baseline:0, current:35, target:500, unit:"nodes" },
+    { label:"Documented rescues / recoveries", baseline:0, current:480, target:10000, unit:"cases" },
+    { label:"Families completing preparedness program", baseline:0, current:9500, target:250000, unit:"families" },
+    { label:"Strategic stockpile coverage", baseline:5, current:22, target:90, unit:"%" },
+  ],
+  covenant: {
+    preamble:"We affirm a renewed covenant for a protected republic, and commit to:",
+    principles:[
+      { id:"children", text:"Place the safety of children at the center of public life." },
+      { id:"family", text:"Strengthen families as the foundation of community." },
+      { id:"truth", text:"Defend truth, discernment, and open inquiry." },
+      { id:"service", text:"Serve our neighbors and communities directly." },
+      { id:"vigilance", text:"Remain vigilant sentinels, not passive spectators." },
+      { id:"renewal", text:"Pursue cultural and spiritual renewal." },
+    ],
+  },
+  glossary: {
+    assets:[
+      { label:"Threat Maps (reference)", description:"See the interactive map in Section 5.", href:"#border-cartel-internal" },
+      { label:"Rescue Protocol (reference)", description:"See the protocol stepper in Section 8.", href:"#national-rescue-operations" },
+      { label:"Sample Legislation (reference)", description:"See the bill generator in Section 11.", href:"#legislative-framework" },
+    ],
+    glossary:[
+      { term:"5GW", definition:"Fifth-generation warfare — conflict waged through information and perception." },
+      { term:"OSINT", definition:"Open-source intelligence — information gathered from publicly available sources." },
+      { term:"HUMINT", definition:"Human intelligence — information gathered through interpersonal contact." },
+      { term:"Watchtower Model", definition:"The document's layered approach combining OSINT and HUMINT." },
+      { term:"SAFE-USA", definition:"The proposed Strategic Arsenal & Freedom Emergency Fund." },
+      { term:"Civic Defense Brigade", definition:"A community-based protection and preparedness group described for schools." },
+      { term:"Sanctuary Entry Protocol", definition:"The described step-by-step process for safe placement during rescue operations." },
+    ],
+  },
+};
+
+/* ============================================================================
+   HELPERS
+   ============================================================================ */
+const $ = (s,r=document)=>r.querySelector(s);
+const el = (tag,attrs={},...kids)=>{
+  const n=document.createElement(tag);
+  for(const k in attrs){ if(k==="class")n.className=attrs[k]; else if(k.startsWith("on"))n.addEventListener(k.slice(2),attrs[k]); else if(k==="html")n.innerHTML=attrs[k]; else n.setAttribute(k,attrs[k]); }
+  for(const c of kids.flat()){ if(c==null)continue; n.append(c.nodeType?c:document.createTextNode(c)); }
+  return n;
+};
+const fmt = n => n.toLocaleString("en-US");
+const sevColor = s => s>=3?"#ef4444":s===2?"#f59e0b":"#22c55e";
+const catColor = c => ({Border:"#3b82f6",Cartel:"#ef4444",Internal:"#a855f7",
+  OSINT:"#3b82f6",HUMINT:"#22c55e",National:"#3b82f6",Regional:"#f59e0b",Global:"#22c55e"}[c]||"#3b82f6");
+
+/* ============================================================================
+   TOOL RENDERERS  — each returns a DOM node
+   ============================================================================ */
+const TOOLS = {
+  "readiness-gauge": ()=> {
+    const box = el("div");
+    DATA.readiness.forEach(g=>{
+      box.append(el("div",{class:"card",style:"margin-bottom:10px"},
+        el("div",{class:"row between"}, el("strong",{},g.label),
+          el("span",{class:"muted"}, `${g.value} / target ${g.target}`)),
+        el("div",{class:"bar",style:"margin:8px 0 4px"}, el("span",{style:`width:${g.value}%`})),
+        g.note? el("div",{class:"muted",style:"font-size:12px"}, g.note):null));
+    });
+    return box;
+  },
+
+  "concept-explorer": ()=> {
+    const box=el("div");
+    DATA.concepts.forEach(c=>{
+      box.append(el("details",{},
+        el("summary",{},c.term),
+        el("p",{class:"muted",style:"margin:8px 0"},c.definition),
+        el("div",{class:"row"}, c.indicators.map(i=>el("span",{class:"pill"},i)))));
+    });
+    return box;
+  },
+
+  "risk-assessment-checklist": ()=> {
+    const d=DATA.deterrenceChecklist, box=el("div");
+    const out=el("div",{class:"card",style:"margin-bottom:14px"});
+    const list=el("div");
+    const checked={};
+    const render=()=>{
+      const score=d.items.reduce((s,i)=>s+(checked[i.id]?i.weight:0),0);
+      let band=d.bands[0]; d.bands.forEach(b=>{ if(score>=b.min)band=b; });
+      out.innerHTML="";
+      out.append(el("div",{class:"row between"},el("span",{class:"big"},score+""),
+        el("strong",{},band.label)),
+        el("div",{class:"bar",style:"margin:8px 0"},el("span",{style:`width:${Math.min(score,100)}%`})),
+        el("div",{class:"muted",style:"font-size:13px"},band.note));
+    };
+    d.items.forEach(i=>{
+      const cb=el("input",{type:"checkbox",onchange:e=>{checked[i.id]=e.target.checked;render();}});
+      list.append(el("label",{class:"ck"},cb,el("span",{},`${i.label} `,el("span",{class:"muted"},`(+${i.weight})`))));
+    });
+    box.append(out,list); render(); return box;
+  },
+
+  "intel-source-builder": ()=> {
+    const d=DATA.intelSources, box=el("div");
+    const on={};
+    const cov=el("div",{class:"card",style:"margin-bottom:14px"});
+    const render=()=>{
+      const covered=new Set(d.sources.filter(s=>on[s.id]).map(s=>s.category));
+      cov.innerHTML="";
+      cov.append(el("div",{class:"row between"},
+        el("span",{},"Category coverage"),
+        el("strong",{},`${covered.size} / ${d.categories.length}`)));
+      cov.append(el("div",{class:"row",style:"margin-top:8px"},
+        d.categories.map(c=>el("span",{class:"pill"+(covered.has(c)?" on":"")},c))));
+    };
+    box.append(cov);
+    d.sources.forEach(s=>{
+      box.append(el("label",{class:"ck"},
+        el("input",{type:"checkbox",onchange:e=>{on[s.id]=e.target.checked;render();}}),
+        el("span",{}, el("strong",{},s.name),
+          el("span",{class:"pill",style:`margin-left:8px;border-color:${catColor(s.kind)};color:${catColor(s.kind)}`},s.kind),
+          el("div",{class:"muted",style:"font-size:12.5px"},`${s.category} — ${s.description}`))));
+    });
+    render(); return box;
+  },
+
+  "threat-map": ()=> {
+    const d=DATA.threats, box=el("div");
+    const active=new Set(d.categories);
+    const map=el("div",{class:"map"});
+    const detail=el("div",{class:"muted",style:"margin-top:10px;min-height:20px"},"Click a marker for detail.");
+    const filters=el("div",{class:"row",style:"margin-bottom:10px"});
+    const render=()=>{
+      map.innerHTML="";
+      d.markers.filter(m=>active.has(m.category)).forEach(m=>{
+        const size=10+m.severity*4;
+        map.append(el("div",{class:"marker",title:m.label,
+          style:`left:${m.x}%;top:${m.y}%;width:${size}px;height:${size}px;background:${catColor(m.category)}`,
+          onclick:()=>{ detail.textContent=`${m.label} — ${m.category} (severity ${m.severity}): ${m.detail}`; }}));
+      });
+    };
+    d.categories.forEach(c=>{
+      filters.append(el("span",{class:"pill on",
+        onclick:e=>{ if(active.has(c)){active.delete(c);e.target.classList.remove("on");}else{active.add(c);e.target.classList.add("on");} render(); }},
+        el("span",{class:"swatch",style:`background:${catColor(c)}`}),c));
+    });
+    const legend=el("div",{class:"legend"},
+      el("span",{},el("span",{class:"swatch",style:"background:#22c55e"}),"sev 1"),
+      el("span",{},el("span",{class:"swatch",style:"background:#f59e0b"}),"sev 2"),
+      el("span",{},el("span",{class:"swatch",style:"background:#ef4444"}),"sev 3"),
+      el("span",{class:"muted"},"(marker color = category, size = severity)"));
+    box.append(filters,map,legend,detail); render(); return box;
+  },
+
+  "stockpile-planner": ()=> {
+    const d=DATA.stockpile, box=el("div");
+    const inp=el("input",{type:"number",min:"0",value:d.defaultPopulation});
+    const tbody=el("tbody");
+    const render=()=>{
+      const pop=Math.max(0,+inp.value||0);
+      tbody.innerHTML="";
+      d.items.forEach(i=>{
+        const qty=Math.round(pop*i.perThousand/1000);
+        tbody.append(el("tr",{},el("td",{},i.label),
+          el("td",{},`${i.perThousand} / 1k`),
+          el("td",{},el("strong",{},`${fmt(qty)} ${i.unit}`))));
+      });
+    };
+    inp.addEventListener("input",render);
+    box.append(el("div",{class:"row",style:"margin-bottom:12px"},
+      el("span",{},"Population served:"),inp),
+      el("table",{},el("thead",{},el("tr",{},el("th",{},"Item"),el("th",{},"Rate"),el("th",{},"Recommended"))),tbody));
+    render(); return box;
+  },
+
+  "brigade-builder": ()=> {
+    const d=DATA.brigade, box=el("div");
+    const inp=el("input",{type:"number",min:"0",value:d.defaultStudents});
+    const tbody=el("tbody");
+    const render=()=>{
+      const students=Math.max(0,+inp.value||0);
+      const mult=students/d.studentsPer;
+      tbody.innerHTML="";
+      d.roles.forEach(r=>{
+        const rec=Math.min(r.max,Math.ceil(r.recommendedPer*mult));
+        tbody.append(el("tr",{},el("td",{},r.label),
+          el("td",{},`${r.recommendedPer} / ${d.studentsPer}`),
+          el("td",{},el("strong",{},rec+""))));
+      });
+    };
+    inp.addEventListener("input",render);
+    box.append(el("div",{class:"row",style:"margin-bottom:12px"},el("span",{},"Students:"),inp),
+      el("table",{},el("thead",{},el("tr",{},el("th",{},"Role"),el("th",{},"Ratio"),el("th",{},"Recommended"))),tbody));
+    render(); return box;
+  },
+
+  "protocol-stepper": ()=> {
+    const d=DATA.rescueProtocol, box=el("div");
+    const done={};
+    const prog=el("div",{class:"bar",style:"margin-bottom:14px"},el("span",{style:"width:0%"}));
+    const render=()=>{ const c=Object.values(done).filter(Boolean).length;
+      prog.firstChild.style.width=`${Math.round(c/d.steps.length*100)}%`; };
+    d.steps.forEach((s,idx)=>{
+      box.append(el("label",{class:"ck"},
+        el("input",{type:"checkbox",onchange:e=>{done[idx]=e.target.checked;render();}}),
+        el("span",{}, el("strong",{},`${idx+1}. ${s.title}`),
+          el("div",{class:"muted",style:"font-size:13px"},s.detail))));
+    });
+    return el("div",{},prog,box);
+  },
+
+  "pledge-commitment-tracker": ()=> buildSelector(DATA.pledge.commitments, DATA.pledge.intro, "My Pledge"),
+  "covenant-builder": ()=> buildSelector(DATA.covenant.principles, DATA.covenant.preamble, "Our Covenant"),
+
+  "fund-allocation-simulator": ()=> {
+    const d=DATA.fundBuckets, box=el("div");
+    const vals={}; d.buckets.forEach(b=>vals[b.id]=b.defaultPct);
+    const total=el("div",{class:"row between",style:"margin-bottom:10px"});
+    const barStack=el("div",{class:"bar",style:"height:18px;margin-bottom:14px;display:flex"});
+    const rows=el("div");
+    const render=()=>{
+      const sum=Object.values(vals).reduce((a,b)=>a+b,0);
+      total.innerHTML="";
+      total.append(el("strong",{},d.totalLabel),
+        el("span",{class:sum===100?"":"",style:`color:${sum===100?'#22c55e':'#f59e0b'}`},`Total: ${sum}%`));
+      barStack.innerHTML="";
+      d.buckets.forEach(b=>barStack.append(el("span",{style:`width:${vals[b.id]}%;background:${b.color};height:100%`})));
+    };
+    d.buckets.forEach(b=>{
+      const num=el("span",{class:"muted"},vals[b.id]+"%");
+      const r=el("input",{type:"range",min:"0",max:"100",value:vals[b.id],style:"flex:1",
+        oninput:e=>{vals[b.id]=+e.target.value;num.textContent=vals[b.id]+"%";render();}});
+      rows.append(el("div",{class:"row",style:"margin:6px 0"},
+        el("span",{style:`min-width:170px`},el("span",{class:"swatch",style:`background:${b.color}`}),b.label),
+        r,num));
+    });
+    box.append(total,barStack,rows); render(); return box;
+  },
+
+  "bill-template-generator": ()=> {
+    const d=DATA.billTemplate, box=el("div");
+    const sel={}; const titleInp=el("input",{type:"number"});
+    const out=el("div",{class:"out"});
+    const nameInp=el("input",{class:"search",style:"margin-bottom:10px",placeholder:"Short title of the Act (e.g., The Protect Our Children Act)"});
+    const render=()=>{
+      const chosen=d.provisions.filter(p=>sel[p.id]);
+      out.textContent = `${d.titlePrefix}\nTo establish ${nameInp.value||"[short title]"}.\n\n`
+        + (chosen.length? chosen.map(p=>p.text).join("\n\n") : "Select provisions below to assemble the bill text.");
+    };
+    nameInp.addEventListener("input",render);
+    const list=el("div");
+    d.provisions.forEach(p=>{
+      list.append(el("label",{class:"ck"},
+        el("input",{type:"checkbox",onchange:e=>{sel[p.id]=e.target.checked;render();}}),
+        el("span",{},p.label)));
+    });
+    const copy=el("button",{class:"btn",style:"margin-top:10px",
+      onclick:()=>{navigator.clipboard&&navigator.clipboard.writeText(out.textContent);copy.textContent="Copied!";setTimeout(()=>copy.textContent="Copy bill text",1200);}},"Copy bill text");
+    box.append(nameInp,list,out,copy); render(); return box;
+  },
+
+  "deprogramming-pathway": ()=> {
+    const d=DATA.deprogramming, box=el("div");
+    box.append(el("div",{class:"stub",style:"margin-bottom:12px"},d.disclaimer));
+    const view=el("div",{class:"card"});
+    const go=(id)=>{
+      const node=d.nodes[id]; view.innerHTML="";
+      if(node.outcome){
+        view.append(el("p",{},el("strong",{},"Suggested next step:")),el("p",{class:"muted"},node.outcome),
+          el("button",{class:"btn",onclick:()=>go(d.start)},"Start over"));
+      } else {
+        view.append(el("p",{},el("strong",{},node.prompt)),
+          el("div",{class:"row"},node.options.map(o=>el("button",{class:"btn",onclick:()=>go(o.next)},o.label))));
+      }
+    };
+    go(d.start); box.append(view); return box;
+  },
+
+  "surveillance-detox-checklist": ()=> {
+    const d=DATA.detoxChecklist, box=el("div");
+    const all=d.categories.flatMap(c=>c.items);
+    const done={};
+    const prog=el("div",{},el("div",{class:"row between"},el("span",{},"Progress"),el("strong",{class:"pcount"},"0%")),
+      el("div",{class:"bar",style:"margin:8px 0 16px"},el("span",{style:"width:0%"})));
+    const render=()=>{ const c=Object.values(done).filter(Boolean).length;
+      const pct=Math.round(c/all.length*100);
+      $(".pcount",prog).textContent=pct+"%"; $(".bar>span",prog).style.width=pct+"%"; };
+    d.categories.forEach(cat=>{
+      const block=el("div",{style:"margin-bottom:12px"},el("strong",{},cat.label));
+      cat.items.forEach(i=>block.append(el("label",{class:"ck"},
+        el("input",{type:"checkbox",onchange:e=>{done[i.id]=e.target.checked;render();}}),el("span",{},i.label))));
+      box.append(block);
+    });
+    return el("div",{},prog,box);
+  },
+
+  "deployment-timeline": ()=> {
+    const d=DATA.timeline, box=el("div");
+    let active="All";
+    const tl=el("div",{class:"tl"});
+    const render=()=>{
+      tl.innerHTML="";
+      d.milestones.filter(m=>active==="All"||m.region===active).forEach(m=>{
+        tl.append(el("div",{class:"mil"},
+          el("div",{class:"row"},el("strong",{},`${m.phase} · ${m.period}`),
+            el("span",{class:"pill",style:`border-color:${catColor(m.region)};color:${catColor(m.region)}`},m.region)),
+          el("div",{},m.title),el("div",{class:"muted",style:"font-size:13px"},m.detail)));
+      });
+    };
+    const filters=el("div",{class:"row",style:"margin-bottom:12px"});
+    ["All",...d.regions].forEach(r=>filters.append(el("span",{class:"pill"+(r==="All"?" on":""),
+      onclick:e=>{active=r;[...filters.children].forEach(c=>c.classList.remove("on"));e.target.classList.add("on");render();}},r)));
+    box.append(filters,tl); render(); return box;
+  },
+
+  "metrics-dashboard": ()=> {
+    const box=el("div");
+    DATA.metrics.forEach(m=>{
+      const pct=Math.round((m.current-m.baseline)/(m.target-m.baseline)*100);
+      box.append(el("div",{class:"card",style:"margin-bottom:10px"},
+        el("div",{class:"row between"},el("strong",{},m.label),el("span",{class:"muted"},pct+"% to target")),
+        el("div",{class:"bar",style:"margin:8px 0 4px"},el("span",{style:`width:${pct}%;background:#22c55e`})),
+        el("div",{class:"muted",style:"font-size:12.5px"},`baseline ${fmt(m.baseline)} ${m.unit} · current ${fmt(m.current)} · target ${fmt(m.target)}`)));
+    });
+    return box;
+  },
+
+  "appendix-explorer": ()=> {
+    const d=DATA.glossary, box=el("div");
+    box.append(el("strong",{},"Reference assets"));
+    d.assets.forEach(a=>box.append(el("div",{class:"card",style:"margin:8px 0"},
+      el("a",{href:a.href},a.label),el("div",{class:"muted",style:"font-size:13px"},a.description))));
+    box.append(el("strong",{style:"display:block;margin-top:14px"},"Glossary"));
+    const search=el("input",{class:"search",style:"margin:10px 0",placeholder:"Search terms…"});
+    const list=el("div");
+    const render=()=>{ const q=search.value.toLowerCase(); list.innerHTML="";
+      d.glossary.filter(g=>!q||g.term.toLowerCase().includes(q)||g.definition.toLowerCase().includes(q))
+        .forEach(g=>list.append(el("div",{style:"padding:7px 0;border-bottom:1px solid var(--line)"},
+          el("strong",{},g.term),el("div",{class:"muted",style:"font-size:13.5px"},g.definition)))); };
+    search.addEventListener("input",render);
+    box.append(search,list); render(); return box;
+  },
+};
+
+function buildSelector(items, intro, heading){
+  const box=el("div");
+  const sel={};
+  const out=el("div",{class:"out"});
+  const render=()=>{
+    const chosen=items.filter(i=>sel[i.id]);
+    out.textContent = `${heading}\n\n${intro}\n\n` + (chosen.length? chosen.map(i=>"• "+i.text).join("\n") : "(select commitments below)");
+  };
+  const list=el("div");
+  items.forEach(i=>list.append(el("label",{class:"ck"},
+    el("input",{type:"checkbox",onchange:e=>{sel[i.id]=e.target.checked;render();}}),el("span",{},i.text))));
+  const print=el("button",{class:"btn",style:"margin-top:10px",onclick:()=>window.print()},"Print");
+  box.append(el("p",{class:"muted"},intro),list,out,print); render(); return box;
+}
+
+/* ============================================================================
+   SECTION PROSE  — mirrors content/sections/*.mdx
+   ============================================================================ */
+function inlineMd(t){
+  return t
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g,"<em>$1</em>");
+}
+function mdToHtml(md){
+  const lines=md.split("\n"); let html=""; let list=null;
+  const closeList=()=>{ if(list){ html+=`</${list}>`; list=null; } };
+  for(const raw of lines){
+    const line=raw.trim();
+    if(!line){ closeList(); continue; }
+    let m;
+    if(m=line.match(/^###\s+(.*)/)){ closeList(); html+=`<h4>${inlineMd(m[1])}</h4>`; }
+    else if(m=line.match(/^##\s+(.*)/)){ closeList(); html+=`<h3>${inlineMd(m[1])}</h3>`; }
+    else if(m=line.match(/^-\s+(.*)/)){ if(list!=="ul"){closeList();html+="<ul>";list="ul";} html+=`<li>${inlineMd(m[1])}</li>`; }
+    else if(m=line.match(/^(\d+)\.\s+(.*)/)){ if(list!=="ol"){closeList();html+="<ol>";list="ol";} html+=`<li>${inlineMd(m[2])}</li>`; }
+    else { closeList(); html+=`<p>${inlineMd(line)}</p>`; }
+  }
+  closeList(); return html;
+}
+
+const BODIES = {
+"introduction": `## Overview
+
+This document, *American Defense Readiness 2030 — Protect & Defend the Unwelcomed*, opens by framing what its authors describe as a convergence of pressures on the Republic. The introduction argues that strategic, institutional, and cultural challenges are no longer separate problems handled by separate agencies, but interlocking strains that, in the authors' view, reinforce one another and demand a single coordinated response.
+
+### The argument the document makes
+
+The authors contend that traditional readiness — measured largely in conventional military and industrial terms — no longer captures the full picture. They argue that a nation can field capable forces and still be vulnerable if public trust erodes, if families and communities fragment, and if the everyday information environment is shaped by actors who do not share its interests. The document presents these as "soft" failures with "hard" consequences.
+
+To make the case concrete, the introduction is paired with a **National Readiness Snapshot** — an editable set of gauges spanning strategic deterrence, institutional trust, cultural cohesion, child protection, and industrial capacity. The figures shown are illustrative starting points meant to prompt discussion, not official measurements; readers are invited to adjust them to reflect their own assessments.
+
+### What the document says is at stake
+
+- **Children as the central concern.** The authors repeatedly frame protection of children as the organizing priority of the entire doctrine.
+- **Information and belief as contested ground.** The document argues that attention, trust, and shared reality are now subjects of deliberate influence.
+- **Community-level preparedness.** Rather than locating all responsibility in federal institutions, the doctrine emphasizes families, schools, faith communities, and local networks.
+- **Lawful, coordinated action.** The authors stress that the measures they propose are meant to operate within existing legal and constitutional structures and in cooperation with established authorities.
+
+### How to read this document
+
+The introduction asks readers to approach the chapters as a connected argument rather than a menu of unrelated proposals. Each subsequent section develops one strand and pairs it with an interactive tool so readers can explore the concept rather than only read about it. This edition **presents** the authors' positions so they can be examined, searched, and discussed; where claims are contested or sensitive, it attributes them to the document rather than asserting them as established fact.`,
+
+"war-on-the-mind": `## Overview
+
+This section sets out the document's account of what it calls "the war on the mind." The authors argue that conflict in the information age is waged less through territory and materiel than through attention, perception, and belief — and that this shift has consequences for families and young people in particular.
+
+### Fifth-generation warfare, as the document defines it
+
+The authors use the term **fifth-generation warfare (5GW)** to describe conflict conducted primarily through information, perception, and social influence rather than conventional force. In their framing, the contested ground is the shared sense of reality a society relies on to make decisions together. The accompanying explorer lets readers open each concept and view the indicators the document associates with it.
+
+### The concepts the document highlights
+
+- **Attention capture.** Systems the authors describe as designed to maximize engagement, redirecting focus away from deliberate, self-directed thought.
+- **Mass grooming (the document's term).** The authors' label for what they characterize as large-scale efforts aimed at shaping the beliefs and identities of young people; presented as a contested claim.
+- **Identity disruption.** Pressures the authors argue destabilize a young person's sense of self, faith, and country.
+
+### Why the document treats this as a defense issue
+
+The authors' central move is to reframe influence operations as a national-security concern rather than a purely cultural or commercial one. They argue that if attention and belief can be shaped at scale, the resilience of a population's judgment becomes a strategic asset worth protecting.
+
+### A constructive emphasis
+
+The document's proposed response is protective and educational rather than coercive: media literacy, deliberate attention habits, strong family relationships, and the ability to seek out reliable information. The authors present discernment — slowing down, checking claims, resisting manufactured consensus — as the practical countermeasure, and connect it to the recovery and privacy practices developed later in the document.`,
+
+"child-centered-deterrence": `## Overview
+
+This section develops what the authors call **child-centered deterrence**. The argument is that deterrence — usually discussed in terms of armies and arsenals — should be reframed around the protection of children, which the document treats as the organizing priority of the entire doctrine.
+
+### Reframing deterrence
+
+The authors apply deterrence logic at the level of community and family: they argue that exploitation, trafficking, and predatory influence are deterred when protection is visible, coordinated, and locally rooted. The document locates this work within lawful structures, emphasizing coordination with schools, established reporting channels, and law enforcement.
+
+### A self-assessment, not a mandate
+
+The interactive **Community Preparedness Self-Assessment** turns the section's themes into a practical checklist. Each item reflects a protective practice the document discusses:
+
+- A discussed family safety and communication plan.
+- Knowing the school's protection and reporting points of contact.
+- Household online-use rules and parental controls.
+- Connection to a neighborhood or community watch network.
+- Knowing how to report exploitation or trafficking concerns.
+- Children being able to name several trusted adults.
+- Awareness of local counseling and recovery resources.
+
+The tool is a private reflection aid: nothing is submitted anywhere, and the score helps a household decide which gaps to close next.
+
+### What the document emphasizes
+
+Prevention is relational; reporting matters; and recovery is part of protection. The section closes by framing preparedness as a shared civic habit — prepared households are encouraged to mentor others rather than treat readiness as a private achievement.`,
+
+"osint-humint-watchtower": `## Overview
+
+This section presents the document's **Watchtower Model** — its proposal for combining open-source intelligence (OSINT) and human intelligence (HUMINT) into a layered "national shield." The authors argue that awareness, drawn from many ordinary and lawful sources, is itself a form of protection.
+
+### Two kinds of intelligence
+
+- **OSINT (open-source intelligence)** — information from publicly available sources: open reporting and filings, public social signals, open forums, and searchable official registries.
+- **HUMINT (human intelligence)** — information through people and relationships: community tip lines, trusted faith and civic liaisons, and field observers.
+
+The authors argue that neither layer is sufficient alone, and the "watchtower" image conveys overlapping vantage points rather than a single all-seeing eye.
+
+### Composing coverage
+
+The interactive **Watchtower Coverage Builder** lets readers toggle sources and see how many of five categories are covered. The point is the document's argument that resilience comes from **diversity of sources**.
+
+### Lawful and rights-respecting by design
+
+As presented here, the model is built on **publicly available information and voluntary community relationships**. It is framed as a tool for situational awareness and for routing concerns to the proper authorities — not for surveilling specific individuals, and not as a substitute for law enforcement or due process. The authors emphasize that respect for privacy and civil liberties is a condition of its legitimacy.
+
+### Why the document frames awareness as a shield
+
+The authors argue that many harms they describe depend on going unnoticed, and their proposed remedy is distributed, lawful attention — a culture of informed vigilance in which residents know how to report what they see.`,
+
+"border-cartel-internal": `## Overview
+
+This section surveys what the document describes as the nation's threat posture across three categories — **border**, **cartel**, and **internal** — and presents them together on an interactive map.
+
+### Three categories, one picture
+
+- **Border** concerns center on high-traffic crossing and smuggling corridors.
+- **Cartel** concerns cover organized trafficking and distribution networks.
+- **Internal** concerns address domestic vulnerabilities such as online recruitment and exploitation and transit chokepoints.
+
+The document's argument is that these are not isolated problems: the same routes and networks can carry different harms, so the authors treat them as a single connected posture.
+
+### Reading the Threat Posture Map
+
+The map places illustrative markers on a simplified map of the United States, each with a category, severity (1–3), and description. Two cautions, in keeping with the document's framing: the markers are **illustrative and editable**, not a live intelligence feed; and the map is a **conceptual aid**, not operational direction.
+
+### What the document emphasizes
+
+The authors use this section to argue for **coordination** among federal, state, local, and community partners, operating lawfully. The map connects later to the rescue-operations protocol (Section 8) and the sample-legislation tools (Section 11). Readers are encouraged to consult authoritative sources for current, verified information.`,
+
+"strategic-stockpiles": `## Overview
+
+This section presents the document's case for **strategic stockpiles** and what it calls domestic arsenal zones — pre-positioned reserves of essential supplies intended to make communities resilient during emergencies.
+
+### The argument for reserves
+
+The authors argue that resilience depends on having essential goods on hand before they are needed. The emphasis is on **continuity and care** — keeping people supplied, connected, and treated during an emergency.
+
+### The Stockpile Estimator
+
+A reader enters the population to be served, and the tool calculates recommended quantities from editable per-capita ratios. The defaults per 1,000 people are:
+
+- **Emergency water reserve** — 3,000 gallons
+- **Shelf-stable meals** — 9,000 meals
+- **Trauma / medical kits** — 40 kits
+- **Backup generators** — 2 units
+- **Field radios** — 15 units
+- **Reserve fuel** — 500 gallons
+
+These figures are starting points for discussion, not official standards, and the ratios can be edited to match local guidance.
+
+### How the document frames implementation
+
+Stockpiling scales from the household to the regional level. The authors tie it to the SAFE-USA fund (Section 10) and to the metrics framework (Section 15), and treat it as **lawful, civic preparedness** in the tradition of emergency-management planning — reviewed regularly so reserves remain current.`,
+
+"school-shields-brigades": `## Overview
+
+This section presents the document's proposals for protecting schools and organizing what the authors call **civic defense brigades** — trained, community-based groups intended to support safety and preparedness around schools.
+
+### School shields
+
+The "school shield" concept combines clear safety roles, trained personnel, established reporting and communication channels, and strong ties between schools and the families they serve. The emphasis is on **preparedness and coordination**.
+
+### Civic defense brigades
+
+As the document describes them, brigades are organized rosters of trained volunteers who support a school's safety functions in cooperation with staff and authorities:
+
+- **Safety coordinator** — oversees the plan and serves as the point of contact.
+- **Trained monitors** — provide attentive presence and awareness.
+- **First-aid responders** — supply basic medical and trauma readiness.
+- **Family liaison** — keeps families informed and connected.
+- **Communications lead** — manages reliable information flow.
+
+The document frames these as civic, lawful, cooperative roles.
+
+### The Brigade Planner
+
+The planner sizes a brigade for a given number of students using editable recommended ratios that can be adjusted to local policy.
+
+### What the document emphasizes
+
+The authors present this section in terms of **training, coordination, and care**, locating volunteers as a supportive layer in partnership with school officials and established authorities — not a replacement for professionals.`,
+
+"national-rescue-operations": `## Overview
+
+This section presents the document's **rescue-operations and sanctuary-entry protocol** — an ordered, step-by-step process for responding to reports of exploitation or endangerment in a lawful, coordinated, and trauma-informed way.
+
+### A protocol, not a free hand
+
+The most important feature, as the authors present it, is that response is **procedural and authorized at every step**. The protocol is built around coordination with law enforcement and authorized partners; it does not describe or endorse independent action.
+
+1. **Intake & verification** — confirm the report and document the situation through proper channels.
+2. **Coordinate with authorities** — engage law enforcement and authorized partners before any action.
+3. **Assess safety & risk** — evaluate risk to the individual and to responders.
+4. **Secure sanctuary placement** — identify a vetted, lawful safe placement.
+5. **Transport under protocol** — move only with authorized personnel and proper documentation.
+6. **Stabilize & provide care** — provide medical, trauma-informed, and basic-needs support.
+7. **Follow-up & casework** — continue casework, recovery resources, and review.
+
+### What the document emphasizes
+
+Verification comes first; authorities are engaged early; and care continues after the immediate response. Concerns surfaced through community vigilance enter a defined, accountable process rather than improvised intervention.
+
+### A note on scope
+
+This edition presents the protocol as a framework for understanding and discussion. It is high-level and procedural; it is not operational guidance and does not substitute for professional training, legal counsel, or the direction of qualified authorities.`,
+
+"faith-family-renewal": `## Overview
+
+This section presents what the authors call the **faith, family, and cultural renewal doctrine** — the document's argument that the deepest form of national resilience is cultural, rooted in strong families, shared values, and engaged communities.
+
+### The argument
+
+The authors argue that institutions and stockpiles are not enough if cultural foundations weaken. Their proposed remedy is renewal: protecting family time, nurturing faith and shared values, mentoring the young, serving neighbors, and cultivating discernment. This edition **presents** the doctrine as the authors articulate it, for understanding and reflection rather than as claims asserted as fact.
+
+### From doctrine to personal commitment
+
+From the document's stated intention — *"I commit to the following in support of family and community renewal"* — a reader selects commitments and assembles a printable pledge:
+
+- Protecting regular, device-free family time.
+- Nurturing faith and shared values in the household.
+- Mentoring or supporting a young person in the community.
+- Giving time to a local service or charitable effort.
+- Seeking out reliable information and modeling discernment.
+- Knowing and supporting one's neighbors.
+
+The pledge is entirely voluntary and personal; selections stay in the reader's own browser.
+
+### Connections within the document
+
+This section ties back to the "war on the mind" (Section 2) and points forward to the concluding covenant (Section 16). In the document's logic, renewal is the human foundation on which the more structural proposals rest.`,
+
+"safe-usa-fund": `## Overview
+
+This section explains the document's proposed funding mechanism: the **SAFE-USA fund** — the Strategic Arsenal & Freedom Emergency Fund. The authors argue the doctrine's other proposals require a dedicated, accountable source of support.
+
+### Why a dedicated fund
+
+The authors contend that durable capacity needs a stable funding stream with clear priorities, so that preparedness does not depend on year-to-year improvisation.
+
+### The allocation simulator
+
+The simulator lets a reader distribute a notional 100% across priorities, with a live total. The default allocation is:
+
+- **Child rescue & recovery — 30%**
+- **School shields — 20%**
+- **Strategic stockpiles — 15%**
+- **Watchtower / intelligence — 15%**
+- **Recovery programs — 10%**
+- **Emergency reserve — 10%**
+
+The tool flags whether selections add up to 100%, making trade-offs visible. These percentages are illustrative starting points for discussion.
+
+### What the allocation reveals
+
+Child rescue and recovery receives the largest share, consistent with the authors' framing of child protection as the central concern. The remaining priorities map directly to earlier sections.
+
+### Accountability
+
+The document frames SAFE-USA as a public, accountable instrument, connecting to the oversight provisions in Section 11 and the metrics dashboard in Section 15.`,
+
+"legislative-framework": `## Overview
+
+This section presents the document's **legislative framework** — its argument that the doctrine's goals should be pursued through ordinary, lawful policymaking, and its proposal for the kinds of provisions such legislation might contain.
+
+### Working through the legislative process
+
+The authors are explicit that durable change runs through law: drafting clear provisions, building support, and enacting and overseeing them through established institutions. References to advocacy and political-action committees are presented in this conventional civic light.
+
+### The Sample Bill Generator
+
+A reader assembles a model bill by selecting provisions; the tool adds a short title and combines them into formatted, copyable text:
+
+- **Definitions** — establishes the terms used in the Act.
+- **Child protection mandate** — protective standards for minors.
+- **Reporting requirements** — defined incidents reported within a timeframe.
+- **Funding authorization** — authorizes appropriations.
+- **Oversight & audit** — periodic audits and reporting.
+- **Enforcement** — penalties established by the responsible agency.
+
+The generated text is a **template for learning and drafting conversations**, not actual legislation or legal advice.
+
+### What the structure emphasizes
+
+The framework pairs a child-protection mandate with reporting requirements, and funding authorization with oversight and audit. Enforcement is administered by a responsible agency rather than private actors, consistent with the document's commitment to lawful institutions.`,
+
+"psychological-warfare-reversal": `## Overview
+
+This section presents the document's **reversal and recovery program** concepts — its proposed response to the influence dynamics described in Section 2.
+
+### From diagnosis to recovery
+
+The authors argue that the effects of attention capture and identity disruption can be addressed through deliberate, supportive practices. Terms like "de-hypnosis" and "deprogramming" describe regaining focus, re-examining beliefs through reliable sources, and rebuilding trusted relationships — framed as **educational and relational** practices rather than clinical interventions.
+
+### A self-guided pathway
+
+The pathway asks whether the reader is considering their own situation or a family member's, then offers low-pressure suggestions:
+
+- For one's own **focus**, a structured media break and daily reflection, pointing to the surveillance-detox checklist in Section 13.
+- For **re-examining beliefs**, writing down the claim, finding primary sources across perspectives, and discussing with a trusted mentor.
+- For a family member **open to talking**, leading with listening and shared activities.
+- For one **not yet open**, rebuilding connection first and seeking guidance from a counselor.
+
+### An explicit limitation
+
+The tool carries a prominent disclaimer: this is a **self-guided, informational pathway — not medical or psychological advice.** For urgent concerns, contact a qualified professional.
+
+### What the document emphasizes
+
+Patience, connection, and discernment. The authors favor listening over confrontation and treat professional help as a strength to seek rather than a last resort.`,
+
+"surveillance-detox": `## Overview
+
+This section presents the document's guidance on **strategic intelligence reclamation and surveillance detox** — practical steps individuals and families can take to strengthen their digital privacy and security.
+
+### Reclaiming a personal information footprint
+
+"Surveillance detox," as the document uses the term, refers to **lawful, personal digital hygiene**: reducing unnecessary data exposure, hardening accounts and devices, and making deliberate choices about services. The framing mirrors mainstream cybersecurity and privacy guidance.
+
+### The detox checklist
+
+**Accounts**
+- Use a password manager and unique passwords.
+- Enable two-factor authentication on key accounts.
+- Review and revoke unused app permissions.
+
+**Devices**
+- Keep devices and software updated.
+- Audit location-sharing settings.
+- Review microphone and camera permissions.
+
+**Data footprint**
+- Submit opt-outs to major data brokers.
+- Use a privacy-respecting search engine.
+- Audit public information on social profiles.
+
+Everything stays in the reader's own browser; none of it involves accessing anyone else's information.
+
+### What the document emphasizes
+
+The guidance is **defensive and lawful by design** — protecting one's own accounts, devices, and data, or exercising rights such as data-broker opt-outs. It pairs with the recovery pathway in Section 12, and the authors present digital hygiene as a habit to maintain rather than a one-time task.`,
+
+"watchtower-deployment": `## Overview
+
+This section lays out the document's **phased deployment schedule** for the watchtower model (Section 4) and its proposed roadmap for expansion through 2030.
+
+### A phased approach
+
+Rather than immediate full-scale implementation, the authors describe a deliberate, staged rollout — starting small, learning from pilots, and expanding as the approach proves workable:
+
+- **Phase 1 — 2026 (National):** Pilot watchtower nodes — stand up initial nodes and training.
+- **Phase 2 — 2027 (Regional):** Regional expansion — extend coverage to regional hubs.
+- **Phase 3 — 2028 (National):** Civic brigade integration — integrate school shields and brigades.
+- **Phase 4 — 2029 (Global):** Allied coordination — coordinate with allied partners.
+- **Phase 5 — 2030 (Global):** Full deployment — reach target deployment and benchmarks.
+
+These dates are the document's proposed schedule, offered for discussion rather than as fixed commitments.
+
+### What the sequence reveals
+
+Training precedes expansion; integration of the community layer comes mid-roadmap; and global coordination comes last, framed in terms of working with allied partners.
+
+### Connections within the document
+
+The timeline operationalizes the watchtower concept from Section 4 and connects to the metrics dashboard in Section 15: the final phase is defined by reaching measurable benchmarks rather than by the calendar alone.`,
+
+"restoration-metrics": `## Overview
+
+This section presents the document's **restoration metrics and deterrence benchmarks** — its proposed way of measuring whether the doctrine is working.
+
+### Measuring progress, not just intentions
+
+By defining a baseline, a current value, and a target, the authors create a simple way to see how far an effort has come. The dashboard shows each indicator as a progress bar, where completion is *(current − baseline) ÷ (target − baseline)*:
+
+- **Schools with civic defense brigades** — baseline 0, current 1,200, target 50,000.
+- **Active watchtower nodes** — baseline 0, current 35, target 500.
+- **Documented rescues / recoveries** — baseline 0, current 480, target 10,000.
+- **Families completing preparedness program** — baseline 0, current 9,500, target 250,000.
+- **Strategic stockpile coverage** — baseline 5%, current 22%, target 90%.
+
+These figures are illustrative, editable values, not verified official statistics.
+
+### How the metrics tie the document together
+
+Each indicator maps to an earlier section, making the dashboard a single scoreboard for the whole doctrine.
+
+### What the document emphasizes
+
+Commitments should be accountable. Targets make priorities explicit, and tracking over time guards against complacency. Readers are encouraged to ask how each would be measured in practice and to replace them with verified figures where available.`,
+
+"conclusion-covenant": `## Overview
+
+This concluding section gathers the document's themes into what the authors call **a new covenant for a protected republic** — a statement of shared principles meant to summarize the doctrine and invite commitment to it.
+
+### From doctrine to covenant
+
+The choice of the word *covenant* signals the authors' intent: a shared, voluntary commitment rather than a top-down program. The covenant's preamble, as the document states it, reads: *"We affirm a renewed covenant for a protected republic, and commit to."* The principles offered are:
+
+- Place the safety of children at the center of public life.
+- Strengthen families as the foundation of community.
+- Defend truth, discernment, and open inquiry.
+- Serve our neighbors and communities directly.
+- Remain vigilant sentinels, not passive spectators.
+- Pursue cultural and spiritual renewal.
+
+### The Covenant Builder
+
+The builder lets a reader select principles and assemble a printable covenant. Like the pledge in Section 9, it is voluntary and personal; selections remain in the reader's own browser.
+
+### How the conclusion frames the whole
+
+Each principle echoes an earlier section, so the conclusion functions as a summary in the form of commitments. The authors end on a constructive, participatory note — vigilance as engaged citizenship rather than fear. This edition presents the covenant as the authors articulate it, for reflection.`,
+
+"appendices": `## Overview
+
+This appendix collects reference materials for the document: pointers to the interactive assets used throughout, and a searchable glossary of the key terms.
+
+### Reference assets
+
+The explorer links back to the document's interactive reference tools so they can be found in one place:
+
+- **Threat Maps** — the interactive threat-posture map in Section 5.
+- **Rescue Protocols** — the step-by-step protocol in Section 8.
+- **Sample Legislation** — the bill generator in Section 11.
+
+### Searchable glossary
+
+The appendix includes a glossary searchable by keyword:
+
+- **5GW** — fifth-generation warfare; conflict waged through information and perception.
+- **OSINT** — open-source intelligence; information from publicly available sources.
+- **HUMINT** — human intelligence; information gathered through interpersonal contact.
+- **Watchtower Model** — the document's layered approach combining OSINT and HUMINT.
+- **SAFE-USA** — the proposed Strategic Arsenal & Freedom Emergency Fund.
+- **Civic Defense Brigade** — a community-based protection and preparedness group described for schools.
+- **Sanctuary Entry Protocol** — the described step-by-step process for safe placement during rescue operations.
+
+### How to use this appendix
+
+The appendix supports the rest of the document rather than introducing new arguments. As with the full document, the materials are presented for understanding, reference, and discussion, and readers are encouraged to consult authoritative external sources for current, verified information.`,
+};
+
+/* ============================================================================
+   PAGE BUILD
+   ============================================================================ */
+$("#site-title").textContent=SITE.title;
+$("#site-sub").textContent=SITE.subtitle;
+$("#doc-tagline").textContent=SITE.tagline;
+$("#doc-title").textContent=SITE.title;
+$("#doc-subtitle").textContent=SITE.subtitle;
+$("#doc-meta").textContent=`${SITE.author} · ${SITE.partners} · ${SITE.version}`;
+
+const toc=$("#toc"), secWrap=$("#sections");
+SECTIONS.forEach(s=>{
+  toc.append(el("li",{},el("a",{href:"#"+s.slug,"data-title":s.title.toLowerCase()},
+    el("span",{class:"n"},s.n+"."),el("span",{},s.title))));
+
+  const sec=el("section",{class:"sec",id:s.slug},
+    el("div",{class:"kicker"},`Section ${s.n}`),
+    el("h2",{class:"title"},s.title),
+    el("div",{class:"summary"},s.summary),
+    el("div",{class:"body",html:mdToHtml(BODIES[s.slug]||("## Overview\n\n"+s.summary))}),
+    el("div",{class:"tool"},
+      el("h3",{},"Interactive tool"),
+      el("div",{class:"tool-kind"},s.tool),
+      (TOOLS[s.tool]||(()=>el("div",{class:"muted"},"(tool)")))()));
+  secWrap.append(sec);
+});
+
+/* search filter */
+$("#search").addEventListener("input",e=>{
+  const q=e.target.value.toLowerCase();
+  toc.querySelectorAll("a").forEach(a=>{
+    a.classList.toggle("hidden", q && !a.dataset.title.includes(q));
+  });
+});
+</script>
+</body>
+</html>

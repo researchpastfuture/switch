@@ -1,0 +1,30 @@
+---
+import { TOC } from '../../data/toc';
+interface Props {
+  current: string;
+}
+const { current } = Astro.props;
+---
+
+<nav class="no-print text-sm" aria-label="Table of contents">
+  <p class="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Contents</p>
+  <ol class="space-y-0.5">
+    {
+      TOC.map((entry) => (
+        <li>
+          <a
+            href={`/sections/${entry.slug}`}
+            class:list={[
+              'block rounded px-2 py-1.5 leading-snug',
+              entry.slug === current
+                ? 'bg-blue-50 font-medium text-blue-700'
+                : 'text-slate-600 hover:bg-slate-100',
+            ]}
+          >
+            <span class="text-slate-400">{entry.number}.</span> {entry.title}
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>

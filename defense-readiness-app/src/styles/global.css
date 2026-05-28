@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Saved-highlight styling (applied by the research toolkit). */
+mark.adr-highlight {
+  background-color: #fef08a;
+  padding: 0 0.1em;
+  border-radius: 2px;
+}
+
+/* On-page print: show only the article prose for a clean single-section printout. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: #fff;
+  }
+  main {
+    max-width: none !important;
+  }
+}
+
+.print-only {
+  display: none;
+}
